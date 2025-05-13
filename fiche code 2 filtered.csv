@@ -1,0 +1,341 @@
+Station,Category,Class,Order,Family,Subfamily,Genus,Species,Taxonomie
+1,-,Aves,Anseriformes,Anatidae,-,-,-,Anatidae 1
+1,-,Aves,Anseriformes,Anatidae,-,-,-,Anatidae 2
+1,-,Aves,Charadriiformes,Haematopodidae,-,Haematopus,ostralegus,Haematopus ostralegus 1
+1,-,Aves,Charadriiformes,Laridae,-,-,-,Laridae 2
+1,-,Aves,Passeriformes,Sturnidae,-,Sturnus,vulgaris,Sturnus vulgaris
+1,-,Aves,Suliformes,Phalacrocidae,-,Phalacrocorax,carbo,Phalacrocorax carbo 1
+1,-,Aves,Suliformes,Phalacrocoracidae,-,Phalacrocorax,carbo,Phalacrocorax carbo 2
+1,-,Mammalia,Carnivora,Phocidae,-,-,-,Phocidae
+1,-,Mammalia,Cetacea,Delphinidae,Delphininae,-,-,Delphininae 1
+1,-,Mammalia,Cetacea,Delphinidae,Delphininae,-,-,Delphininae 2
+1,-,Mammalia,Cetacea,Phocoenidae,-,Phocoena,phocoena,Phocoena phocoena
+1,-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Ondatra,zibethicus,Ondatra zibethicus
+1,-,Mammalia,Rodentia,Myocastoridae,-,Myocastor,coypus,Myocastor coypus
+1,DIA,Actinopterygii,Anguilliformes,Anguillidae,-,Anguilla,anguilla,Anguilla anguilla 1
+1,DIA,Actinopterygii,Scorpaeniformes,Cyclopteridae,Cyclopterinae,Cyclopterus,lumpus,Cyclopterus lumpus
+1,ER,Actinopterygii,Atheriniformes,Atherinidae,Atherininae,Atherina,presbyter,Atherina presbyter
+1,ER,Actinopterygii,Blenniiformes,Blenniidae,Salariinae,Lipophrys,pholis,Lipophrys pholis
+1,ER,Actinopterygii,Blenniiformes,Blenniidae,Salariinae,Parablennius,gattorugine,Parablennius gattorugine
+1,ER,Actinopterygii,Callionymiformes,Callionymidae,-,Callionymus,lyra,Callionymus lyra
+1,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Aphia,minuta,Aphia minuta 2
+1,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Gobius,niger,Gobius niger
+1,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Gobius,paganellus,Gobius paganellus 2
+1,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Pomatoschistus,-,Pomatoschistus sp. 1
+1,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobionellinae,Pomatoschistus,-,Pomatoschistus sp. 2
+1,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobionellinae,Pomatoschistus,-,Pomatoschistus sp. 3
+1,ER,Actinopterygii,Mugiliformes,Mugilidae,-,Chelon,-,Chelon sp.
+1,ER,Actinopterygii,Perciformes,Moronidae,-,Dicentrarchus,labrax,Dicentrarchus labrax
+1,ER,Actinopterygii,Perciformes,Pholidae,Pholinae,Pholis,gunnellus,Pholis gunnellus
+1,ER,Actinopterygii,Syngnathiformes,Syngnathidae,Nerophinae,Nerophis,lumbriciformis,Nerophis lumbriciformis
+1,ER,Actinopterygii,Perciformes,Ammodytidae,-,Gymnammodytes,semisquamatus,Gymnammodytes semisquamatus
+1,ER,Actinopterygii,Scorpaeniformes,-,-,-,-,Scorpaeniformes 1
+1,MA,Actinopterygii,Perciformes,Labridae,-,Labrus,bergylta,Labrus bergylta
+1,MA,Actinopterygii,Perciformes,Labridae,-,Symphodus,bailloni,Symphodus bailloni
+1,MA,Actinopterygii,Perciformes,Labridae,-,Symphodus,melops,Symphodus melops
+1,MA,Actinopterygii,Perciformes,Sparidae,-,Diplodus,-,Diplodus sp.
+1,MA,Actinopterygii,Perciformes,Sparidae,-,Sparus,aurata,Sparus aurata
+1,MA,Actinopterygii,Pleuronectiformes,Bothidae,-,Arnoglossus,laterna,Arnoglossus laterna
+1,MA,Actinopterygii,Pleuronectiformes,Soleidae,-,Solea,solea,Solea solea
+1,MA,Actinopterygii,Syngnathiformes,Syngnathidae,Hippocampinae,Hippocampus,hippocampus,Hippocampus hippocampus
+1,MJ,Actinopterygii,Clupeiformes,Clupeidae,-,-,-,Clupeidae
+1,MJ,Actinopterygii,Cypriniformes,Cyprinidae,Cyprininae,Cyprinus,carpio,Cyprinus carpio
+1,MJ,Actinopterygii,Perciformes,Ammodytidae,-,-,-,Ammodytidae 3
+1,MJ,Actinopterygii,Perciformes,Scombridae,Scombrinae,Scomber,scombrus,Scomber scombrus
+1,MJ,Actinopterygii,Perciformes,Sparidae,-,Spondyliosoma,cantharus,Spondyliosoma cantharus 1
+1,MJ,Actinopterygii,Pleuronectiformes,Pleuronectidae,-,-,-,Pleuronectidae
+1,MJ,Actinopterygii,"Scorpae,iformes",Triglidae,Triglinae,-,-,Triglinae
+1,MS,Actinopterygii,Beloniformes,Belonidae,,Belone,belone,Belone belone
+1,NA,Actinopterygii,Perciformes,-,-,-,-,Perciformes
+1,NA,Actinopterygii,Blenniiformes,Blenniidae,Salariinae,Coryphoblennius,galerita,Coryphoblennius galerita
+1,NA,Actinopterygii,Mulliformes,Mullidae,-,Mullus,surmuletus,Mullus surmuletus
+1,NA,Actinopterygii,Perciformes,Labridae,-,Ctenolabrus,rupestris,Ctenolabrus rupestris
+1,NA,Actinopterygii,Salmoniformes,Salmonidae,Salmoninae,Salmo,salar,Salmo salar
+1,NA,Actinopterygii,Scorpaeniformes,Liparidae,-,Liparis,liparis,Liparis liparis
+1,NA,Actinopterygii,Clupeiformes,Alosidae,-,Sardina,pilchardus,Sardina pilchardus
+2,-,Amphibia,Caudata,Salamandridae,Pleurodelinae,Lissotriton,helveticus,Lissotriton helveticus
+2,-,Aves,Anseriformes,Anatidae,-,-,-,Anatidae 1
+2,-,Aves,Anseriformes,Anatidae,-,-,-,Anatidae 2
+2,-,Aves,Anseriformes,Anatidae,-,-,-,Anatidae 3
+2,-,Aves,Charadriiformes,Haematopodidae,-,Haematopus,ostralegus,Haematopus ostralegus 2
+2,-,Aves,Charadriiformes,Laridae,-,-,-,Laridae 1
+2,-,Aves,Charadriiformes,Laridae,-,-,-,Laridae 2
+2,-,Aves,Charadriiformes,Scolopacidae,-,-,-,Scolopacidae 1
+2,-,Aves,Charadriiformes,Scolopacidae,-,-,-,Scolopacidae 2
+2,-,Aves,Charadriiformes,Scolopacidae,,Numenius,arquata,Numenius arquata
+2,-,Aves,Columbiformes,Columbidae,,-,-,Columbidae
+2,-,Aves,Gruiformes,Rallidae,-,Fulica,atra,Fulica atra
+2,-,Aves,Gruiformes,Rallidae,-,Gallinula,chloropus,Gallinula chloropus
+2,-,Aves,Passeriformes,Sturnidae,-,Sturnus,vulgaris,Sturnus vulgaris
+2,-,Aves,Passeriformes,-,-,-,-,Passeriformes 4
+2,-,Aves,Passeriformes,Corvidae,-,-,-,Corvidae
+2,-,Aves,Pelecaniformes,Ardeidae,Ardeinae,Bubulcus,ibis,Bubulcus ibis
+2,-,Aves,Podicipediformes,Podicipedidae,-,Podiceps,nigricollis,Podiceps nigricollis
+2,-,Aves,Suliformes,Phalacrocidae,-,Phalacrocorax,carbo,Phalacrocorax carbo 1
+2,-,Mammalia,Carnivora,Phocidae,-,-,-,Phocidae
+2,-,Mammalia,Cetacea,Delphinidae,Delphininae,-,-,Delphininae 1
+2,-,Mammalia,Cetacea,Delphinidae,Delphininae,-,-,Delphininae 2
+2,-,Mammalia,Cetacea,Phocoenidae,-,Phocoena,phocoena,Phocoena phocoena
+2,-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Ondatra,zibethicus,Ondatra zibethicus
+2,-,Mammalia,Rodentia,Muridae,Murinae,Rattus,norvegicus,Rattus norvegicus
+2,-,Mammalia,Rodentia,Myocastoridae,-,Myocastor,coypus,Myocastor coypus
+2,DIA,Actinopterygii,Anguilliformes,Anguillidae,-,Anguilla,anguilla,Anguilla anguilla 2
+2,DIA,Actinopterygii,Perciformes,Ammodytidae,-,Gymnammodytes,semisquamatus,Gymnammodytes semisquamatus
+2,ER,Actinopterygii,Atheriniformes,Atherinidae,Atherininae,Atherina,presbyter,Atherina presbyter
+2,ER,Actinopterygii,Blenniiformes,Blenniidae,Salariinae,Lipophrys,pholis,Lipophrys pholis
+2,ER,Actinopterygii,Blenniiformes,Blenniidae,Salariinae,Parablennius,gattorugine,Parablennius gattorugine
+2,ER,Actinopterygii,Callionymiformes,Callionymidae,-,Callionymus,lyra,Callionymus lyra
+2,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Gobius,paganellus,Gobius paganellus 2
+2,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Pomatoschistus,-,Pomatoschistus sp. 1
+2,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobionellinae,Pomatoschistus,-,Pomatoschistus sp. 2
+2,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobionellinae,Pomatoschistus,-,Pomatoschistus sp. 3
+2,ER,Actinopterygii,Mugiliformes,Mugilidae,-,Chelon,-,Chelon sp.
+2,ER,Actinopterygii,Mulliformes,Mullidae,-,Mullus,surmuletus,Mullus surmuletus
+2,ER,Actinopterygii,Perciformes,Scombridae,Scombrinae,Scomber,scombrus,Scomber scombrus
+2,ER,Actinopterygii,Perciformes,Sparidae,-,Sparus,aurata,Sparus aurata
+2,MA,Actinopterygii,Perciformes,Labridae,-,Labrus,bergylta,Labrus bergylta
+2,MA,Actinopterygii,Perciformes,Labridae,-,Symphodus,bailloni,Symphodus bailloni
+2,MA,Actinopterygii,Perciformes,Labridae,-,Symphodus,melops,Symphodus melops
+2,MA,Actinopterygii,Perciformes,Moronidae,-,Dicentrarchus,labrax,Dicentrarchus labrax
+2,MA,Actinopterygii,Pleuronectiformes,Pleuronectidae,-,-,-,Pleuronectidae
+2,MA,Actinopterygii,Pleuronectiformes,Soleidae,-,Pegusa,lascaris,Pegusa lascaris
+2,MA,Actinopterygii,Salmoniformes,Salmonidae,Salmoninae,Salmo,salar,Salmo salar
+2,MA,Actinopterygii,Cypriniformes,Cyprinidae,-,-,-,Cyprinidae
+2,MJ,Actinopterygii,Clupeiformes,Clupeidae,-,-,-,Clupeidae
+2,MJ,Actinopterygii,Cypriniformes,Cyprinidae,-,-,-,Cyprinidae 1
+2,MJ,Actinopterygii,Perciformes,Ammodytidae,-,-,-,Ammodytidae 2
+2,MJ,Actinopterygii,Perciformes,Sparidae,-,Spondyliosoma,cantharus,Spondyliosoma cantharus 1
+2,MJ,Actinopterygii,Pleuronectiformes,Soleidae,-,Solea,solea,Solea solea
+2,MJ,Actinopterygii,Scorpaeniformes,Cyclopteridae,Cyclopterinae,Cyclopterus,lumpus,Cyclopterus lumpus
+2,MS,Actinopterygii,Beloniformes,Belonidae,,Belone,belone,Belone belone
+2,NA,Actinopterygii,Cypriniformes,Cyprinidae,Cyprininae,Cyprinus,carpio,Cyprinus carpio
+2,NA,Actinopterygii,Cypriniformes,Leuciscidae,Leuciscinae,-,-,Leuciscinae
+2,NA,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Gobius,niger,Gobius niger
+2,NA,Actinopterygii,Perciformes,Ammodytidae,-,-,-,Ammodytidae 1
+2,NA,Actinopterygii,Perciformes,Ammodytidae,-,-,-,Ammodytidae 3
+2,NA,Actinopterygii,Perciformes,Labridae,-,Centrolabrus,exoletus,Centrolabrus exoletus
+2,NA,Actinopterygii,Perciformes,Labridae,-,Ctenolabrus,rupestris,Ctenolabrus rupestris
+2,NA,Actinopterygii,Salmoniformes,Salmonidae,Salmoninae,Salmo,trutta,Salmo trutta
+2,NA,Actinopterygii,Clupeiformes,Alosidae,-,Sardina,pilchardus,Sardina pilchardus
+2,NA,Actinopterygii,Scorpaeniformes,-,-,-,-,Scorpaenoidei 1
+3,-,Amphibia,Anura,Bufonidae,-,Bufo,spinosus,Bufo spinosus
+3,-,Aves,-,-,-,-,-,Aves
+3,-,Aves,Anseriformes,Anatidae,-,-,-,Anatidae 1
+3,-,Aves,Anseriformes,Anatidae,-,-,-,Anatidae 2
+3,-,Aves,Anseriformes,Anatidae,Tadorninae,Tadorna,-,Tadorna sp.
+3,-,Aves,Charadriiformes,-,-,-,-,Charadriiformes
+3,-,Aves,Charadriiformes,Haematopodidae,-,Haematopus,ostralegus,Haematopus ostralegus 1
+3,-,Aves,Charadriiformes,Laridae,-,-,-,Laridae 1
+3,-,Aves,Charadriiformes,Scolopacidae,-,-,-,Scolopacidae 1
+3,-,Aves,Charadriiformes,Scolopacidae,-,-,-,Scolopacidae 2
+3,-,Aves,Charadriiformes,Scolopacidae,,Numenius,-,Numenius sp.
+3,-,Aves,Columbiformes,Columbidae,-,-,-,Columbidae
+3,-,Aves,Gruiformes,Rallidae,-,Fulica,atra,Fulica atra
+3,-,Aves,Gruiformes,Rallidae,-,Gallinula,chloropus,Gallinula chloropus
+3,-,Aves,Passeriformes,Sturnidae,-,Sturnus,vulgaris,Sturnus vulgaris
+3,-,Aves,Passeriformes,-,-,-,-,Passeriformes 3
+3,-,Aves,Passeriformes,-,-,-,-,Passeriformes 4
+3,-,Aves,Passeriformes,Corvidae,-,-,-,Corvidae
+3,-,Aves,Podicipediformes,Podicipedidae,-,Podiceps,cristatus,Podiceps cristatus
+3,-,Aves,Suliformes,Phalacrocidae,-,Phalacrocorax,carbo,Phalacrocorax carbo 1
+3,-,Aves,Suliformes,Phalacrocoracidae,-,Phalacrocorax,carbo,Phalacrocorax carbo 2
+3,-,Mammalia,Artiodactyla,Cervidae,Capreolinae,Capreolus,capreolus,Capreolus capreolus
+3,-,Mammalia,Carnivora,Phocidae,-,-,-,Phocidae
+3,-,Mammalia,Cetacea,Delphinidae,Delphininae,-,-,Delphininae 1
+3,-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Ondatra,zibethicus,Ondatra zibethicus
+3,-,Mammalia,Rodentia,Muridae,Murinae,Apodemus,sylvaticus,Apodemus sylvaticus
+3,-,Mammalia,Rodentia,Muridae,Murinae,Rattus,norvegicus,Rattus norvegicus
+3,-,Mammalia,Rodentia,Myocastoridae,-,Myocastor,coypus,Myocastor coypus
+3,-,Mammalia,Soricomorphes,Talpidae,Talpinae,Talpa,europaea,Talpa europaea
+3,DIA,Actinopterygii,Anguilliformes,Anguillidae,-,Anguilla,anguilla,Anguilla anguilla 1
+3,DIA,Actinopterygii,Anguilliformes,Anguillidae,-,Anguilla,anguilla,Anguilla anguilla 2
+3,DIA,Actinopterygii,Clupeiformes,Alosidae,-,Sardina,pilchardus,Sardina pilchardus
+3,ER,Actinopterygii,Atheriniformes,Atherinidae,Atherininae,Atherina,presbyter,Atherina presbyter
+3,ER,Actinopterygii,Blenniiformes,Blenniidae,Salariinae,Lipophrys,pholis,Lipophrys pholis
+3,ER,Actinopterygii,Blenniiformes,Blenniidae,Salariinae,Parablennius,gattorugine,Parablennius gattorugine
+3,ER,Actinopterygii,Callionymiformes,Callionymidae,-,Callionymus,lyra,Callionymus lyra
+3,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Pomatoschistus,-,Pomatoschistus sp. 1
+3,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobionellinae,Pomatoschistus,-,Pomatoschistus sp. 2
+3,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobionellinae,Pomatoschistus,-,Pomatoschistus sp. 3
+3,ER,Actinopterygii,Mugiliformes,Mugilidae,-,Chelon,-,Chelon sp.
+3,ER,Actinopterygii,Perciformes,Ammodytidae,-,-,-,Ammodytidae 3
+3,ER,Actinopterygii,Perciformes,Percidae,-,-,-,Percidae
+3,ER,Actinopterygii,Perciformes,Percidae,Percinae,Gymnocephalus,cernua,Gymnocephalus cernua
+3,ER,Actinopterygii,Cypriniformes,Cyprinidae,-,-,-,Cyprinidae
+3,MA,Actinopterygii,Perciformes,Labridae,-,Symphodus,melops,Symphodus melops
+3,MA,Actinopterygii,Perciformes,Moronidae,-,Dicentrarchus,labrax,Dicentrarchus labrax
+3,MA,Actinopterygii,Pleuronectiformes,Scophthalmidae,-,Zeugopterus,-,Zeugopterus sp. 
+3,MJ,Actinopterygii,Clupeiformes,Clupeidae,-,-,-,Clupeidae
+3,MJ,Actinopterygii,Cypriniformes,Cyprinidae,-,-,-,Cyprinidae 2
+3,MJ,Actinopterygii,Perciformes,Sparidae,-,Sparus,aurata,Sparus aurata
+3,MJ,Actinopterygii,Pleuronectiformes,Soleidae,-,Solea,solea,Solea solea
+3,MJ,Actinopterygii,"Scorpae,iformes",Triglidae,Triglinae,-,-,Triglinae
+3,NA,Actinopterygii,Cypriniformes,Cyprinidae,Cyprininae,Cyprinus,carpio,Cyprinus carpio
+3,NA,Actinopterygii,Cypriniformes,Leuciscidae,Leuciscinae,-,-,Leuciscinae
+3,NA,Actinopterygii,Perciformes,Labridae,-,Labrus,bergylta,Labrus bergylta
+3,NA,Actinopterygii,Perciformes,Labridae,-,Symphodus,bailloni,Symphodus bailloni
+3,NA,Actinopterygii,Salmoniformes,Salmonidae,Salmoninae,Salmo,trutta,Salmo trutta
+3,NA,Actinopterygii,Salmoniformes,Salmonidae,Salmoninae,Salmo,salar,Salmo salar
+3,NA,Actinopterygii,Syngnathiformes,Syngnathidae,Syngnathinae,Syngnathus,acus,Syngnathus acus
+3,NA,Actinopterygii,Perciformes,Ammodytidae,-,Gymnammodytes,semisquamatus,Gymnammodytes semisquamatus
+4,-,Amphibia,Anura,Bufonidae,-,Bufo,spinosus,Bufo spinosus
+4,-,Aves,Anseriformes,Anatidae,-,-,-,Anatidae 1
+4,-,Aves,Anseriformes,Anatidae,-,-,-,Anatidae 2
+4,-,Aves,Anseriformes,Anatidae,Tadorninae,Tadorna,-,Tadorna sp.
+4,-,Aves,Charadriiformes,Laridae,-,-,-,Laridae 1
+4,-,Aves,Charadriiformes,Scolopacidae,-,-,-,Scolopacidae 1
+4,-,Aves,Charadriiformes,Scolopacidae,-,-,-,Scolopacidae 2
+4,-,Aves,Charadriiformes,Scolopacidae,,Numenius,-,Numenius sp.
+4,-,Aves,Columbiformes,Columbidae,-,-,-,Columbidae
+4,-,Aves,Galliformes,Phasianidae,Perdicinae,Alectoris,rufa,Alectoris rufa
+4,-,Aves,Gruiformes,Rallidae,-,Fulica,atra,Fulica atra
+4,-,Aves,Gruiformes,Rallidae,-,Gallinula,chloropus,Gallinula chloropus
+4,-,Aves,Passeriformes,-,-,-,-,Passeriformes 3
+4,-,Aves,Passeriformes,Corvidae,-,-,-,Corvidae
+4,-,Aves,Passeriformes,Corvidae,Corvinae,Garrulus,glandarius,Garrulus glandarius
+4,-,Aves,Pelecaniformes,Ardeidae,,-,-,Ardeidae
+4,-,Aves,Podicipediformes,Podicipedidae,-,Podiceps,cristatus,Podiceps cristatus
+4,-,Aves,Suliformes,Phalacrocidae,-,Phalacrocorax,carbo,Phalacrocorax carbo 1
+4,-,Aves,Suliformes,Phalacrocoracidae,-,Phalacrocorax,carbo,Phalacrocorax carbo 2
+4,-,Mammalia,Artiodactyla,Cervidae,Capreolinae,Capreolus,capreolus,Capreolus capreolus
+4,-,Mammalia,Carnivora,Canidae,Caninae,Vulpes,vulpes,Vulpes vulpes
+4,-,Mammalia,Carnivora,Phocidae,,-,-,Phocidae
+4,-,Mammalia,Cetacea,Delphinidae,Delphininae,-,-,Delphininae 1
+4,-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Myodes,glareolus,Myodes glareolus
+4,-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Ondatra,zibethicus,Ondatra zibethicus
+4,-,Mammalia,Rodentia,Muridae,Murinae,Apodemus,sylvaticus,Apodemus sylvaticus
+4,-,Mammalia,Rodentia,Muridae,Murinae,Rattus,norvegicus,Rattus norvegicus
+4,-,Mammalia,Rodentia,Myocastoridae,-,Myocastor,coypus,Myocastor coypus
+4,DIA,Actinopterygii,Anguilliformes,Anguillidae,-,Anguilla,anguilla,Anguilla anguilla 2
+4,DIA,Actinopterygii,Perciformes,Ammodytidae,-,Gymnammodytes,semisquamatus,Gymnammodytes semisquamatus
+4,ER,Actinopterygii,Atheriniformes,Atherinidae,Atherininae,Atherina,presbyter,Atherina presbyter
+4,ER,Actinopterygii,Blenniiformes,Blenniidae,Salariinae,Parablennius,gattorugine,Parablennius gattorugine
+4,ER,Actinopterygii,Callionymiformes,Callionymidae,-,Callionymus,lyra,Callionymus lyra
+4,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Pomatoschistus,-,Pomatoschistus sp. 1
+4,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobionellinae,Pomatoschistus,-,Pomatoschistus sp. 2
+4,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobionellinae,Pomatoschistus,-,Pomatoschistus sp. 3
+4,ER,Actinopterygii,Mugiliformes,Mugilidae,-,Chelon,-,Chelon sp.
+4,ER,Actinopterygii,Perciformes,Ammodytidae,-,-,-,Ammodytidae 3
+4,ER,Actinopterygii,Perciformes,Percidae,Percinae,Gymnocephalus,cernua,Gymnocephalus cernua
+4,ER,Actinopterygii,Cypriniformes,Cyprinidae,-,-,-,Cyprinidae
+4,MA,Actinopterygii,Perciformes,Labridae,-,Symphodus,bailloni,Symphodus bailloni
+4,MA,Actinopterygii,Perciformes,Moronidae,-,Dicentrarchus,labrax,Dicentrarchus labrax
+4,MA,Actinopterygii,Perciformes,Percidae,-,-,-,Percidae
+4,MA,Actinopterygii,Pleuronectiformes,Soleidae,-,Solea,solea,Solea solea
+4,MA,Actinopterygii,Salmoniformes,Salmonidae,Salmoninae,Salmo,trutta,Salmo trutta
+4,MJ,Actinopterygii,Clupeiformes,Clupeidae,-,-,-,Clupeidae
+4,MJ,Actinopterygii,Cypriniformes,Cyprinidae,Cyprininae,-,-,Cyprininae
+4,MJ,Actinopterygii,Perciformes,Scombridae,Scombrinae,Scomber,scombrus,Scomber scombrus
+4,MJ,Actinopterygii,Syngnathiformes,Syngnathidae,Nerophinae,Nerophis,lumbriciformis,Nerophis lumbriciformis
+4,MS,Actinopterygii,Beloniformes,Belonidae,,Belone,belone,Belone belone
+4,NA,Actinopterygii,Cypriniformes,Cyprinidae,Cyprininae,Cyprinus,carpio,Cyprinus carpio
+4,NA,Actinopterygii,Perciformes,Labridae,-,Ctenolabrus,rupestris,Ctenolabrus rupestris
+4,NA,Actinopterygii,Perciformes,Labridae,-,Labrus,bergylta,Labrus bergylta
+4,NA,Actinopterygii,Salmoniformes,Salmonidae,Salmoninae,Salmo,salar,Salmo salar
+4,NA,Actinopterygii,Clupeiformes,Alosidae,-,Sardina,pilchardus,Sardina pilchardus
+4,NA,"Actinopterygii
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+",Scorpaeniformes,-,-,-,-,Scorpaenoidei 2
+5,-,Amphibia,Anura,Bufonidae,-,Bufo,spinosus,Bufo spinosus
+5,-,Amphibia,Caudata,Salamandridae,Pleurodelinae,Lissotriton,helveticus,Lissotriton helveticus
+5,-,Amphibia,Caudata,Salamandridae,Salamandrinae,Salamandra,salamandra,Salamandra salamandra
+5,-,Aves,-,-,-,-,-,Aves
+5,-,Aves,Accipitriformes,Accipitridae,-,Buteo,buteo,Buteo buteo
+5,-,Aves,Anseriformes,Anatidae,-,-,-,Anatidae 1
+5,-,Aves,Anseriformes,Anatidae,-,-,-,Anatidae 2
+5,-,Aves,Anseriformes,Anatidae,Anatinae,Aix,galericulata,Aix galericulata
+5,-,Aves,Charadriiformes,Laridae,-,-,-,Laridae 1
+5,-,Aves,Charadriiformes,Laridae,-,-,-,Laridae 2
+5,-,Aves,Columbiformes,Columbidae,-,-,-,Columbidae
+5,-,Aves,Gruiformes,Rallidae,-,Fulica,atra,Fulica atra
+5,-,Aves,Gruiformes,Rallidae,-,Gallinula,chloropus,Gallinula chloropus
+5,-,Aves,Passeriformes,Sturnidae,-,Sturnus,vulgaris,Sturnus vulgaris
+5,-,Aves,Passeriformes,-,-,-,-,Passeriformes 1
+5,-,Aves,Passeriformes,-,-,-,-,Passeriformes 2
+5,-,Aves,Passeriformes,-,-,-,-,Passeriformes 3
+5,-,Aves,Passeriformes,-,-,-,-,Passeriformes 4
+5,-,Aves,Passeriformes,Corvidae,-,-,-,Corvidae
+5,-,Aves,Passeriformes,Corvidae,Corvinae,Garrulus,glandarius,Garrulus glandarius
+5,-,Aves,Passeriformes,Paridae,-,-,-,Paridae
+5,-,Aves,Passeriformes,Regulidae,-,Regulus,regulus,Regulus regulus
+5,-,Aves,Passeriformes,Sylviidae,-,Sylvia,atricapilla,Sylvia atricapilla
+5,-,Aves,Pelecaniformes,Ardeidae,-,-,-,Ardeidae
+5,-,Aves,Piciformes,Picidae,Picinae,Dendrocopos,major,Dendrocopos major
+5,-,Aves,Podicipediformes,Podicipedidae,-,Podiceps,cristatus,Podiceps cristatus
+5,-,Aves,Suliformes,Phalacrocoracidae,-,Phalacrocorax,carbo,Phalacrocorax carbo 2
+5,-,Mammalia,Artiodactyla,Cervidae,Capreolinae,Capreolus,capreolus,Capreolus capreolus
+5,-,Mammalia,Carnivora,Canidae,Caninae,Vulpes,vulpes,Vulpes vulpes
+5,-,Mammalia,Carnivora,Mustelidae,Guloninae,Martes,foina,Martes foina
+5,-,Mammalia,Carnivora,Mustelidae,Melinae,Meles,meles,Meles meles
+5,-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Microtus,-,Microtus sp.
+5,-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Microtus,arvalis,Microtus arvalis
+5,-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Microtus,subterraneus,Microtus subterraneus
+5,-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Myodes,glareolus,Myodes glareolus
+5,-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Ondatra,zibethicus,Ondatra zibethicus
+5,-,Mammalia,Rodentia,Muridae,Murinae,Apodemus,sylvaticus,Apodemus sylvaticus
+5,-,Mammalia,Rodentia,Muridae,Murinae,Rattus,norvegicus,Rattus norvegicus
+5,-,Mammalia,Rodentia,Myocastoridae,-,Myocastor,coypus,Myocastor coypus
+5,-,Mammalia,Rodentia,Sciuridae,Sciurinae,Sciurus,vulgaris,Sciurus vulgaris
+5,-,Mammalia,Soricomorphes,Soricidae,Soricinae,Sorex,-,Sorex sp.
+5,DIA,Actinopterygii,Anguilliformes,Anguillidae,-,Anguilla,anguilla,Anguilla anguilla 2
+5,FW,Actinopterygii,Centrarchiformes,Centrarchidae,-,Lepomis,gibbosus,Lepomis gibbosus
+5,FW,Actinopterygii,Cypriniformes,Cyprinidae,Cyprininae,Cyprinus,carpio,Cyprinus carpio
+5,FW,Actinopterygii,Cypriniformes,Leuciscidae,Leuciscinae,-,-,Leuciscinae
+5,FW,Actinopterygii,Cypriniformes,Leuciscidae,Leuciscinae,Squalius,cephalus,Squalius cephalus
+5,FW,Actinopterygii,Cypriniformes,Nemacheilidae,-,Barbatula,barbatula,Barbatula barbatula
+5,FW,Actinopterygii,Esociformes,Esocidae,-,Esox,lucius,Esox lucius
+5,FW,Actinopterygii,Perciformes,Percidae,-,-,-,Percidae
+5,FW,Actinopterygii,Perciformes,Percidae,Percinae,Gymnocephalus,cernua,Gymnocephalus cernua
+5,FW,Actinopterygii,Perciformes,Sparidae,-,Spondyliosoma,cantharus,Spondyliosoma cantharus 1
+5,MJ,Actinopterygii,Salmoniformes,Salmonidae,Salmoninae,Salmo,trutta,Salmo trutta
+5,NA,Actinopterygii,Cypriniformes,Cyprinidae,-,-,-,Cyprinidae 1
+5,NA,Actinopterygii,Cypriniformes,Cyprinidae,-,-,-,Cyprinidae 2
+5,NA,Actinopterygii,Cypriniformes,CYprinidae,-,-,-,Cyprinidae 3
+5,NA,Actinopterygii,Cypriniformes,Cyprinidae,Cyprininae,-,-,Cyprininae
+5,NA,Actinopterygii,Scorpaeniformes,-,-,-,-,Scorpaenoidei 2
+5,NA,Actinopterygii,Cypriniformes,Cyprinidae,-,-,-,Cyprinidae

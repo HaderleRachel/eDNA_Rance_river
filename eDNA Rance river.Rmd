@@ -1,0 +1,1655 @@
+---
+title: "eDNA Rance river"
+author: "Rachel Haderlé"
+date: "2025-05-12"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###Load required packages
+```{r}
+# Data manipulation & plotting
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(ggrepel)
+library(RColorBrewer)
+library(viridis)
+library(cowplot)
+library(fmsb)
+library(gridExtra)
+
+# Spatial data
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(ggspatial)
+library(tidyterra)
+library(geosphere)
+library(raster)
+
+# Biodiversity analysis
+library(ape)
+library(adespatial)
+library(vegan)
+library(factoextra)
+library(VennDiagram)
+library(U.PhyloMaker)
+library(picante)
+library(FD)
+library(betapart)
+library(mFD)
+library(traitdata)
+library(FactoMineR)
+library(factoextra)
+```
+
+###Study area map: Rance estuary
+```{r}
+# Define coordinates for sampling stations
+stations <- data.frame(
+  name = c("Station 1", "Station 2", "Station 3", "Station 4", "Station 5"),
+  lon = c(-2.024, -2.023, -2.007, -1.967, -2.017),
+  lat = c(48.625, 48.606, 48.595, 48.555, 48.484)
+)
+
+# Convert to sf object (WGS84)
+stations_sf <- st_as_sf(stations, coords = c("lon", "lat"), crs = 4326)
+
+# Load base world map
+world <- ne_countries(scale = "large", returnclass = "sf")
+
+# Load Lidar shapefile (adjust path as needed)
+lidar_map <- read_sf("~/Documents/R/ADNeRance/AdneRance/Lidar_Rance_2019_Area-Int10m-RGF93-L93_zone-non-traitee-sursol/Area-Int10m-RGF93-L93_zone-non-traitee-sursol.shp")
+lidar_map <- st_transform(lidar_map, crs = 4326)
+
+# Define geographic bounding box for inset map (Brittany region)
+brittany_bbox <- c(xmin = -3.5, xmax = -1.5, ymin = 47.5, ymax = 49.5)
+
+# Main map with station labels
+main_map <- ggplot() +
+  geom_sf(data = lidar_map, fill = "grey90", color = NA) +
+  geom_label_repel(data = stations %>%
+                     mutate(x_label = lon + c(0.002, -0.002, 0.0015, -0.002, 0.001),
+                            y_label = lat + c(0.0015, 0.001, -0.001, -0.002, -0.004)),
+                   aes(x = x_label, y = y_label, label = name),
+                   color = "black", fontface = "bold", size = 3) +
+  geom_segment(aes(x = -2.01, y = 48.496, xend = -1.99, yend = 48.486), color = "blue", size = 0.8) +
+  geom_segment(aes(x = -2.04, y = 48.614, xend = -2.001, yend = 48.624), color = "blue", size = 0.8) +
+  annotate("text", x = -1.99, y = 48.484, label = "Le Châtelier", color = "blue", hjust = -0.2, vjust = 0.5, size = 3.5) +
+  annotate("text", x = -2.000, y = 48.624, label = "Tidal power plant", color = "blue", hjust = -0.2, vjust = 0.5, size = 3.5) +
+  annotation_scale(location = "bl", width_hint = 0.2) +
+  annotation_north_arrow(location = "bl", which_north = "true",
+                         pad_x = unit(0.3, "in"), pad_y = unit(0.2, "in"),
+                         style = north_arrow_fancy_orienteering,
+                         height = unit(1, "cm"), width = unit(1, "cm")) +
+  coord_sf(xlim = c(-2.1, -1.87), ylim = c(48.475, 48.63), expand = FALSE) +
+  xlab("Longitude") + ylab("Latitude") +
+  theme_minimal() +
+  theme(panel.grid = element_blank())
+```
+
+###Overview map of Brittany with study area highlighted
+```{r}
+overview_map <- ggplot() +
+  geom_sf(data = world, fill = "grey80", color = "black") +
+  geom_rect(aes(xmin = brittany_bbox["xmin"], xmax = brittany_bbox["xmax"],
+                ymin = brittany_bbox["ymin"], ymax = brittany_bbox["ymax"]),
+            color = "red", fill = NA, size = 1) +
+  coord_sf(xlim = c(-5, 10), ylim = c(41, 51)) +
+  theme_void() +
+  theme(legend.position = "none", plot.margin = unit(c(0, 0, 0, 0), "cm"))
+```
+
+###Combine main and overview maps
+```{r}
+combined_map <- ggdraw() +
+  draw_plot(main_map, 0, 0, 1, 1) +
+  draw_plot(overview_map, 0.05, 0.05, 0.25, 0.25)
+
+# Display the final map
+print(combined_map)
+
+# Save the map to a file
+ggsave("Fig1.png", combined_map,
+       width = 7, height = 7, dpi = 1200)
+```
+
+###Alpha diversity
+
+##Vertebrates
+```{r}
+# Load the data
+PAtaxa <- read.csv("fiche code 2 filtered.csv", row.names = NULL, stringsAsFactors = FALSE)
+
+# Harmonize and order the Station levels
+PAtaxa$Station <- factor(as.character(PAtaxa$Station), 
+                         levels = c("1", "2", "3", "4", "5"), 
+                         labels = c("Station 1", "Station 2", "Station 3", "Station 4", "Station 5"))
+# Remove all newlines and unnecessary spaces
+PAtaxa$Class <- gsub("\\s+", " ", PAtaxa$Class) |> trimws()
+PAtaxa$Class <- as.factor(PAtaxa$Class)
+
+# Create the plot
+p <- ggplot(PAtaxa, aes(x = Class, fill = Class)) +
+  geom_bar(width = 0.7, color = "black") +
+  geom_text(stat = 'count', aes(label = ..count..), 
+            vjust = -0.3, size = 2.5) +
+  facet_wrap(~Station, nrow = 1) +
+  scale_fill_viridis_d(option = "D", end = 0.85, name = "Taxonomic Class") +
+  labs(
+    x = NULL,
+    y = "Number of MOTUs Detected"
+  ) +
+  theme_bw(base_size = 11) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.background = element_rect(fill = "grey85", color = "black"),
+    strip.text = element_text(face = "bold"),
+    legend.position = "bottom",
+    panel.grid.major.x = element_blank()
+  )
+
+# Export the plot with 1200 dpi for scientific publication
+ggsave("Fig2.png", plot = p, dpi = 1200, width = 10, height = 5)
+
+```
+
+##Fish only
+```{r}
+# Load the data
+PAtaxa <- read.csv('fiche code 2 filtered.csv', row.names = NULL, stringsAsFactors = FALSE)
+
+# Filter the data for Actinopterygii class
+PAfish <- PAtaxa[PAtaxa$Class == "Actinopterygii",]
+PAfish <- na.omit(PAfish)
+
+# Subset by categories
+DIA <- PAfish[PAfish$Category == "DIA",]
+ER <- PAfish[PAfish$Category == "ER",]
+FW <- PAfish[PAfish$Category == "FW",]
+MA <- PAfish[PAfish$Category == "MA",]
+MJ <- PAfish[PAfish$Category == "MJ",]
+MS <- PAfish[PAfish$Category == "MS",]
+
+# Create a dataframe with the frequency count per category and station
+numbFish <- data.frame(
+  freq = c(
+    nrow(DIA[DIA$Station == "1",]),  nrow(DIA[DIA$Station == "2",]), nrow(DIA[DIA$Station == "3",]),
+    nrow(DIA[DIA$Station == "4",]), nrow(DIA[DIA$Station == "5",]), nrow(ER[ER$Station == "1",]),
+    nrow(ER[ER$Station == "2",]), nrow(ER[ER$Station == "3",]), nrow(ER[ER$Station == "4",]),
+    nrow(ER[ER$Station == "5",]), nrow(FW[FW$Station == "1",]), nrow(FW[FW$Station == "2",]),
+    nrow(FW[FW$Station == "3",]), nrow(FW[FW$Station == "4",]), nrow(FW[FW$Station == "5",]),
+    nrow(MA[MA$Station == "1",]), nrow(MA[MA$Station == "2",]), nrow(MA[MA$Station == "3",]),
+    nrow(MA[MA$Station == "4",]), nrow(MA[MA$Station == "5",]), nrow(MJ[MJ$Station == "1",]),
+    nrow(MJ[MJ$Station == "2",]), nrow(MJ[MJ$Station == "3",]), nrow(MJ[MJ$Station == "4",]),
+    nrow(MJ[MJ$Station == "5",]), nrow(MS[MS$Station == "1",]), nrow(MS[MS$Station == "2",]),
+    nrow(MS[MS$Station == "3",]), nrow(MS[MS$Station == "4",]), nrow(MS[MS$Station == "5",])
+  ),
+  Category = rep(c("DIA", "ER", "FW", "MA", "MJ", "MS"), each = 5),
+  Stat = c("Station 1", "Station 2", "Station 3", "Station 4", "Station 5", 
+           "Station 1", "Station 2", "Station 3", "Station 4", "Station 5", 
+           "Station 1", "Station 2", "Station 3", "Station 4", "Station 5", 
+           "Station 1", "Station 2", "Station 3", "Station 4", "Station 5", 
+           "Station 1", "Station 2", "Station 3", "Station 4", "Station 5", 
+           "Station 1", "Station 2", "Station 3", "Station 4", "Station 5")
+)
+
+# Create the plot
+FISH <- ggplot(numbFish, aes(x = Stat, y = freq, group = Category, colour = Category)) +
+  geom_point(size = 3) + 
+  geom_line(size = 1.2) +
+  scale_colour_manual(values = c("orange", "brown", "green", "darkblue", "lightblue", "blue")) +
+  labs(
+    y = "Number of MOTUs identified",
+    x = NULL,
+    colour = "Actinopterygii Categories"
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.background = element_rect(fill = "grey85", color = "black"),
+    strip.text = element_text(face = "bold"),
+    legend.position = "bottom",
+    panel.grid.major.x = element_blank()
+  ) +
+  ylim(0, 16)
+
+# Display the plot
+print(FISH)
+
+# Save the plot with 1200 dpi for publication
+ggsave("Fig3.png", plot = FISH, dpi = 1200, width = 10, height = 5)
+
+```
+
+##Distance from the river mouth
+```{r}
+# Convert the Station column to a factor with the desired order
+PAtaxa$Station <- factor(PAtaxa$Station, levels = c("1", "2", "3", "4", "5"), labels = c("Station 1", "Station 2", "Station 3", "Station 4", "Station 5"))
+
+# Coordinates of each station along the estuary
+data_points <- data.frame(
+  Station = c("Station 1", "Station 2", "Station 3", "Station 4", "Station 5"),
+  lon = c(-2.024, -2.023, -2.007, -1.967, -2.002),
+  lat = c(48.619, 48.606, 48.595, 48.555, 48.491)
+)
+
+# Coordinates of Station 1 (considered the river mouth)
+station1_lon <- data_points$lon[data_points$Station == "Station 1"]
+station1_lat <- data_points$lat[data_points$Station == "Station 1"]
+
+# Function to compute the Haversine distance between any station and the river mouth
+calculate_distance_to_embouchure <- function(station_lon, station_lat) {
+  distHaversine(c(station1_lon, station1_lat), c(station_lon, station_lat)) / 1000  #in km
+}
+
+# Calculate distance (in kilometers) from each station to the river mouth
+data_points$distance_to_embouchure <- mapply(calculate_distance_to_embouchure, data_points$lon, data_points$lat)
+
+# Display calculated distances to verify spatial positioning
+print(data_points)
+
+# Create a frequency table: number of MOTUs per Class and Station
+freq_table <- PAtaxa %>%
+  group_by(Class, Station) %>%
+  summarise(frequency = n()) %>%
+  arrange(desc(frequency))
+
+# Merge frequency data with station coordinates and distances
+freq_table2 <- freq_table %>% 
+  left_join(data_points, by = "Station") %>%
+  dplyr::select(Class, Station, frequency, distance_to_embouchure)
+
+print(freq_table2)
+
+# Keep only fish data (Class == "Actinopterygii")
+freq_table_fish <- freq_table2 %>% filter(Class == "Actinopterygii")
+print(freq_table_fish)
+
+# Plot: Relationship between fish MOTU richness and distance from the river mouth
+ggplot(freq_table_fish, aes(x = distance_to_embouchure, y = frequency)) +
+  geom_point(aes(group = Class, shape = Class)) +
+  geom_smooth(aes(group = Class), method = "lm") +
+  labs(x = "Distance to mouth (km)", y = "Number of different MOTUs detected") +
+  theme_bw() +
+  ylim(0, 60)
+
+# Normality tests (Shapiro-Wilk) for both variables
+shapiro.test(freq_table_fish$frequency) # => p > 0.05 so normality
+shapiro.test(freq_table_fish$distance_to_embouchure) # => p > 0.05 so normality
+
+# Pearson correlation test between fish MOTU richness and distance to the river mouth
+cor.test(freq_table_fish$frequency, freq_table_fish$distance_to_embouchure, method = "pearson")
+```
+
+###Alpha PD
+##PD Vertebrates
+```{r}
+PAtaxa = read.csv('fiche code 2 filtered.csv', row.names = NULL, stringsAsFactors = FALSE)
+
+# Create a taxonomic list
+test_taxa_list = tibble::tibble(
+  species = PAtaxa$Taxonomie,
+  genus = PAtaxa$Genus,
+  family = PAtaxa$Family,
+  order = PAtaxa$Order
+)
+
+# Select only species, genus, family, and initialize empty columns for relative names
+sp.list <- test_taxa_list %>%
+  dplyr::select(species, genus, family) %>%
+  dplyr::mutate(
+    species.relative = NA,
+    genus.relative = NA
+  )
+
+# Load megatrees for different vertebrate groups
+megatree_fish <- read.tree("phylogeny/fish_megatree.tre")
+megatree_mm <- read.tree("phylogeny/mammal_megatree.tre")
+megatree_oi <- read.tree("phylogeny/bird_megatree.tre")
+megatree_amp <- read.tree("phylogeny/amphibian_megatree.tre")
+megatree_rep <- read.tree("phylogeny/reptile_megatree.tre")
+
+# Combine trees into one
+combined_tree <- bind.tree(megatree_fish, megatree_mm)
+combined_tree <- bind.tree(combined_tree, megatree_oi)
+combined_tree <- bind.tree(combined_tree, megatree_amp)
+
+# Load genus lists
+gen.list_fish <- read.csv("phylogeny/fish_genus_list.csv")
+gen.list_mm <- read.csv("phylogeny/mammal_genus_list.csv")
+gen.list_oi <- read.csv("phylogeny/bird_genus_list.csv")
+gen.list_amp <- read.csv("phylogeny/amphibian_genus_list.csv")
+
+# Merge genus lists
+gen.list <- rbind(gen.list_fish, gen.list_mm, gen.list_oi, gen.list_amp)
+
+# Generate phylogeny from species list
+result <- phylo.maker(sp.list, combined_tree, gen.list, nodes.type = 1, scenario = 3)
+result
+
+phylo <- result$phylo
+phylo
+
+# Load presence/absence data
+PAeDNA <- read.csv("fiche code 1taxo filtered.csv", row.names = 9, stringsAsFactors = FALSE)
+PAeDNA <- PAeDNA[, c(9:13)]
+jaccard <- t(PAeDNA)
+
+# Replace dots with underscores in column names
+colnames(jaccard) <- gsub("\\.", "_", colnames(jaccard))
+
+# Define desired station order
+ordre_stations <- c("STATION.1", "STATION.2", "STATION.3", "STATION.4", "STATION.5")
+
+# Reorder rows according to station order
+jaccard <- jaccard[ordre_stations, ]
+
+# Display reordered dataframe
+print(jaccard)
+
+comm <- jaccard
+
+# Prune phylogeny based on presence/absence matrix
+prunedphy <- prune.sample(comm, phylo)
+prunedphy
+
+# Reorder columns of comm to match tip labels of prunedphy
+comm <- comm[, prunedphy$tip.label]
+print(colnames(comm))
+
+par(mfrow = c(2, 3))
+# Loop through each station and plot tree with presence points
+
+stations <- c("STATION.1", "STATION.2", "STATION.3", "STATION.4", "STATION.5")
+
+for (station in stations) {
+  # Create binary vector for species presence
+  presence <- comm[station, ] == 1
+  
+  # Plot phylogenetic tree
+  plot(prunedphy, show.tip.label = FALSE, main = paste(station), direction = "rightwards")
+  
+  # Add blue dots at tips for present species
+  tiplabels(pch = 16, col = "blue", tip = which(presence))
+}
+
+# Calculate phylogenetic diversity
+pd.result <- pd(comm, phylo, include.root = FALSE)
+print(pd.result)
+
+# Check if tree is rooted
+if (!is.rooted(phylo)) {
+  # Convert to bifurcating tree if necessary
+  phylo_bifurcated <- multi2di(phylo, random = TRUE)
+  
+  # Root tree using first tip label as outgroup
+  phylo_rooted <- root(phylo_bifurcated, outgroup = phylo_bifurcated$tip.label[1], resolve.root = TRUE)
+  
+  # Assign rooted tree
+  phylo <- phylo_rooted
+}
+
+# Recalculate phylogenetic diversity with rooted tree
+pd.result <- pd(comm, phylo, include.root = TRUE)
+print(pd.result)
+
+# Calculate standardized effect size of phylogenetic diversity (SES.PD)
+ses.pd.result <- ses.pd(comm, phylo, null.model = "taxa.labels", run = 1000)
+ses.pd.result
+```
+
+##PD Fish only
+```{r}
+# Create a taxonomic list for fish
+test_taxa_list = tibble::tibble(
+  species = PAtaxa$Taxonomie,
+  genus = PAtaxa$Genus,
+  family = PAtaxa$Family,
+  order = PAtaxa$Order
+)
+
+# Select species, genus, and family columns and add empty relative columns
+sp.list <- test_taxa_list %>%
+  dplyr::select(species, genus, family) %>%
+  dplyr::mutate(
+    species.relative = NA,  # Create a new column species.relative, initialized to NA or desired value
+    genus.relative = NA     # Create a new column genus.relative, initialized to NA or desired value
+  )
+
+# Load fish megatree
+megatree_fish <- read.tree("phylogeny/fish_megatree.tre")
+
+# Load fish genus list
+gen.list_fish <- read.csv("phylogeny/fish_genus_list.csv")
+
+# Create the phylogeny for fish using the selected species list and genus list
+result <- phylo.maker(sp.list, megatree_fish, gen.list_fish, nodes.type = 1, scenario = 3)
+result
+phylo_fish <- result$phylo
+phylo_fish
+
+# For fish only
+jacfish <- read.csv("jacc.fish.csv", header = TRUE, row.names = 1)
+jacfish[,] <- lapply(jacfish[,], as.numeric)
+
+# Replace dots with underscores in column names of jaccard
+colnames(jacfish) <- gsub("\\.", "_", colnames(jacfish))
+
+# Define the desired row order for stations
+ordre_stations <- c("STATION 1", "STATION 2", "STATION 3", "STATION 4", "STATION 5")
+
+# Reorder rows of the dataframe according to the defined order
+jacfish <- jacfish[ordre_stations, ]
+
+# Display the reordered dataframe
+print(jacfish)
+
+commfish <- jacfish
+
+# Calculate the standardized effect size of phylogenetic diversity for fish
+ses.pd.result.fish <- ses.pd(commfish, phylo_fish, null.model = "taxa.labels", run = 1000)
+ses.pd.result.fish
+```
+
+##PD beta fish
+```{r}
+# Compute UniFrac distances between communities using the phylogenetic tree
+unifrac <- unifrac(comm, phylo)
+unifrac
+
+# Convert UniFrac distance to similarity by subtracting from 1
+unifrac_sim <- 1 - unifrac
+
+# Calculate phylogenetic beta diversity components using Jaccard index family
+phylobeta <- phylo.beta.pair(comm, phylo, index.family = "jaccard")
+phylobeta
+
+# Extract the turnover component of phylogenetic beta diversity (phylo.beta.jtu)
+phylobetaturn <- phylobeta$phylo.beta.jtu
+
+# Extract the nestedness-resultant component of phylogenetic beta diversity (phylo.beta.jne)
+phylobetanest <- phylobeta$phylo.beta.jne
+
+# Global sums for turnover, nestedness, and total dissimilarity
+total_turnover <- sum(phylobetaturn)  # Total turnover contribution
+total_nestedness <- sum(phylobetanest)  # Total nestedness contribution
+total_dissimilarity <- total_turnover + total_nestedness  # Total dissimilarity
+
+# Calculate percentage contributions
+percent_turnover <- (total_turnover / total_dissimilarity) * 100
+percent_nestedness <- (total_nestedness / total_dissimilarity) * 100
+
+# Display the results
+cat("Global percentage of turnover (phylo.beta.jtu):", round(percent_turnover, 2), "%\n")
+
+cat("Global percentage of nestedness (phylo.beta.jne):", round(percent_nestedness, 2), "%\n")
+```
+
+#Alpha FD fish
+```{r}
+# Load files
+matriceeDNA <- read.csv("fiche code 1taxo filtered.csv", row.names = NULL, stringsAsFactors = FALSE)
+bddnils <- read.csv2("bddnils.csv", stringsAsFactors = FALSE, fileEncoding = "UTF-8")
+
+# Clean List.E in matriceeDNA
+matriceeDNA$List.E <- gsub("_", ".", matriceeDNA$List.E)           # Replace underscores with dots
+matriceeDNA$List.E <- gsub(" ", ".", matriceeDNA$List.E)           # Replace spaces with dots
+matriceeDNA$List.E <- gsub("\\s*\\(.*?\\)", "", matriceeDNA$List.E) # Remove any text within parentheses
+matriceeDNA$List.E <- gsub("\\d+", "", matriceeDNA$List.E)          # Remove numeric digits
+matriceeDNA$List.E <- gsub("\\s*,\\s*", ",", matriceeDNA$List.E)    # Remove spaces around commas
+
+# Function to extract information from List.E based on bddnils
+get_info_from_listE <- function(listE_string, bddnils) {
+  # Initialize result columns with default NA values
+  default <- data.frame(Pos_guild = NA, Use_guild2 = NA, trophic_guild = NA, LTq5 = NA)
+  
+  # Split the input string into individual species names
+  species_list <- unlist(strsplit(listE_string, ","))
+  
+  # Find matching rows in bddnils where name matches a species
+  matching_rows <- bddnils[bddnils$name %in% species_list, ]
+  
+  if (nrow(matching_rows) > 0) {
+    # For each column of interest, extract values and check consistency
+    result <- sapply(colnames(default), function(col) {
+      col_values <- matching_rows[[col]]
+      
+      # If all values in a column are identical, return the value
+      if (length(unique(col_values)) == 1) {
+        return(unique(col_values))
+      } else {
+        # Otherwise, return NA
+        return(NA)
+      }
+    })
+    
+    # Return the result as a data frame
+    return(as.data.frame(as.list(result)))
+  }
+  
+  # Return default (all NA) if no matches are found
+  return(default)
+}
+
+# Apply the function to each row of matriceeDNA using List.E
+result <- do.call(rbind, lapply(matriceeDNA$List.E, get_info_from_listE, bddnils = bddnils))
+
+# Add the extracted info columns from bddnils to matriceeDNA
+matriceeDNA <- cbind(matriceeDNA, result)
+
+# Save the final dataset to a CSV file
+write.csv(matriceeDNA, "output.csv", row.names = FALSE)
+```
+
+```{r}
+# Filter by class (if necessary)
+matriceeDNA <- matriceeDNA[matriceeDNA$Class == "Actinopterygii", ]
+
+# Set row names as Taxonomy
+sp_tr <- matriceeDNA[, c(9, (ncol(matriceeDNA) - 3):ncol(matriceeDNA))]
+rownames(sp_tr) <- sp_tr$Taxonomie
+sp_tr <- sp_tr[,-1]
+
+# Display the result
+print(sp_tr)
+
+# Convert nominal columns to factors
+sp_tr$Pos_guild <- factor(sp_tr$Pos_guild)
+sp_tr$Use_guild2 <- factor(sp_tr$Use_guild2)
+sp_tr$trophic_guild <- factor(sp_tr$trophic_guild)
+sp_tr$LTq5 <- as.numeric(sp_tr$LTq5)
+
+# Create a dataframe `trait_cat` with trait names and their types
+trait_cat <- data.frame(
+  trait_name = names(sp_tr),  # Trait names are the column names
+  trait_type = sapply(names(sp_tr), function(trait) {
+    
+    # The first three traits are categorical (Nominal: N)
+    if (trait %in% c("Pos_guild", "Use_guild2", "trophic_guild")) {
+      return("N")  # Nominal trait (A, B, C, etc.)
+    }
+    
+    # 'LTq5' is a numeric trait (Quantitative: Q)
+    if (trait == "LTq5") {
+      return("Q")  # Quantitative trait (numeric)
+    }
+    
+    # Otherwise, return fuzzy (F) by default
+    return("F")  # Fuzzy trait (undefined or multi-value)
+  })
+)
+
+# Display the `trait_cat` dataframe
+print(trait_cat)
+
+# Calculate the functional distance matrix using Gower's metric
+list_100_sp_dist <- mFD::funct.dist(sp_tr = sp_tr, tr_cat = trait_cat, metric = "gower", scale_euclid = "range", stop_if_NA = FALSE)
+
+# Compute functional space quality
+list_100_fspaces_quality <- mFD::quality.fspaces(list_100_sp_dist, maxdim_pcoa = 10, deviation_weighting = "absolute",
+                         fdist_scaling = F, fdendro = "average")
+list_100_sp_faxes_coord <- list_100_fspaces_quality$details_fspaces$sp_pc_coord
+
+## Import the CSV file for presence-absence data
+PAeDNA <- read.csv("fiche code 1taxo filtered.csv", row.names = 9, stringsAsFactors = FALSE)
+PAeDNA <- PAeDNA[,c(9:13)]
+jaccard <- t(PAeDNA)
+
+# Function to replace dots between characters with underscores
+replace_dots_between_chars <- function(names_vector) {
+  sapply(names_vector, function(name) {
+    # Replace dots between non-space characters with underscores
+    return(gsub("(?<=\\S)\\.(?=\\S)", "_", name, perl = TRUE))
+  })
+}
+
+# Replace dots between characters with underscores in both column and row names
+colnames(jaccard) <- replace_dots_between_chars(colnames(jaccard))
+rownames(jaccard) <- replace_dots_between_chars(rownames(jaccard))
+
+# Display the dataframe to verify the changes
+print(jaccard)
+
+# Extract row names from 'list_100_sp_faxes_coord'
+sp_names <- rownames(list_100_sp_faxes_coord)
+
+# Filter 'jaccard' to keep only columns that match names in 'sp_names'
+jaccard_filtered <- jaccard[, colnames(jaccard) %in% sp_names]
+
+# Display the filtered dataframe
+print(jaccard_filtered)
+
+# Convert the filtered jaccard dataframe to a matrix
+asb_sp_w <- as.matrix(jaccard_filtered)
+
+# Calculate the functional diversity indices (alpha diversity)
+list_100_alpha_fd_indices <- mFD::alpha.fd.multidim(list_100_sp_faxes_coord[, c("PC1", "PC2","PC3","PC4","PC5")], asb_sp_w = asb_sp_w, scaling=F,
+                           check_input=T, details_returned=T, verbose = TRUE)
+
+# Extract the functional diversity indices values
+list_100_fd_ind_values <- list_100_alpha_fd_indices$functional_diversity_indices
+
+# Extract the values of "fric" and "fmpd"
+fric_values <- list_100_fd_ind_values$fric
+
+# Ensure that the row names (stations or species) are preserved
+fric_values_named <- fric_values
+names(fric_values_named) <- rownames(list_100_fd_ind_values)  # Assign row names
+
+# Verify the results
+print(fric_values_named)
+```
+
+
+```{r}
+# Input data: 
+# 'asb_sp_w' : presence/absence or abundance matrix, rows = stations, columns = species
+# 'sp_tr' : traits matrix, rows = species, columns = traits
+
+# Number of simulations for the null model
+runs <- 999
+
+# Transpose the matrix to have species in rows and stations in columns
+samp <- t(asb_sp_w)
+samp
+# Initialize a matrix to store null FRic values
+null_fric <- matrix(NA, nrow = runs, ncol = ncol(samp))
+colnames(null_fric) <- colnames(samp)
+
+# Loop to generate null assemblages and calculate FRic
+for (i in 1:runs) {
+  # Generate a null assemblage with conservation of species richness per station
+  randomized_samp <- randomizeMatrix(samp, null.model = "richness")
+  
+  # Check the dimensions of the matrix after randomization
+  if (ncol(randomized_samp) != ncol(samp) || nrow(randomized_samp) != nrow(samp)) {
+    stop("The randomized matrix does not have the expected dimensions.")
+  }
+  
+  # Calculate FRic for each station
+  for (station in seq_len(ncol(randomized_samp))) {
+    # Identify the species present in the station
+    species_present <- rownames(randomized_samp)[randomized_samp[, station] > 0]
+    
+    if (length(species_present) == 0) {
+      next  # If no species are present, move to the next station
+    }
+    
+    # Extract the traits of the species present
+    traits_present <- sp_tr[species_present, , drop = FALSE]
+    traits_present <- na.omit(traits_present)
+    
+    if (nrow(traits_present) < 2) {
+      next  # If fewer than 2 species are present, move to the next station
+    }
+    
+    # Calculate FRic with the dbFD function
+    fric_result <- tryCatch({
+      dbFD(traits_present, calc.FRic = TRUE, m = 5, stand.FRic = FALSE)$FRic
+    }, error = function(e) {
+      return(NA)  # Return NA if there's an error
+    })
+    
+    null_fric[i, station] <- fric_result
+  }
+}
+
+# Calculate SES for each station
+ses_fric <- (fric_values_named - colMeans(null_fric, na.rm = TRUE)) / apply(null_fric, 2, sd, na.rm = TRUE)
+
+# Results for SES
+names(ses_fric) <- colnames(samp)
+
+print("SES for FRic by Station:")
+
+print(ses_fric)
+
+
+# Calculate p-values for each station
+p_values <- numeric(ncol(samp))
+names(p_values) <- colnames(samp)
+
+for (station in seq_len(ncol(samp))) {
+  # Observed FRic value for the station
+  observed_fric <- fric_values_named[station]
+  
+  # Null FRic values for the station
+  null_fric_values <- null_fric[, station]
+  
+  # Calculate p-value as the proportion of null values >= observed value
+  p_values[station] <- mean(null_fric_values >= observed_fric, na.rm = TRUE)
+}
+
+# Display p-values
+print("P-values for FRic by Station:")
+print(p_values)
+```
+
+
+#Beta FD fish
+```{r}
+# Select only the first three dimensions for the functional traits (as per the reduction to 5 dimensions in the previous step)
+list_100_sp_faxes_coord_5D <- list_100_sp_faxes_coord[, 1:3]
+
+# Define the desired order of stations
+station_order <- c("STATION_1", "STATION_2", "STATION_3", "STATION_4", "STATION_5")
+
+# Re-arrange the rows of 'asb_sp_w' according to the station order
+asb_sp_w <- asb_sp_w[station_order, ]
+
+# Run the function again with reduced dimensions (5D)
+gc()  # Clean up memory
+fdbeta <- beta.fd.multidim(
+  sp_faxes_coord = list_100_sp_faxes_coord_5D,  # Functional trait coordinates
+  asb_sp_occ = asb_sp_w,  # Species occurrence matrix
+  check_input = TRUE,  # Check the input data
+  beta_family = "Jaccard",  # Choose Jaccard as the beta diversity measure
+  details_returned = TRUE,  # Return detailed results
+  betapart_step = TRUE,  # Use stepwise partitioning for beta diversity
+  betapart_chullopt = list(conv1 = "Qt", conv2 = "QJ"),  # Control parameters for convex hull optimization
+  betapart_para = FALSE,  # Disable parallel processing for betapart
+  betapart_para_opt = betapart::beta.para.control()  # Control settings for parallel processing
+)
+
+# Extract the calculated beta diversity components
+fdbeta <- fdbeta$pairasb_fbd_indices
+fdbetaturn <- fdbeta$jac_turn  # Turnover component
+fdbetanest <- fdbeta$jac_nest  # Nestedness component
+
+fdbeta <- fdbeta$jac_diss  # Total dissimilarity (beta diversity)
+
+fdbeta_sim <- 1 - fdbeta  # Simulated dissimilarity (1 - dissimilarity)
+
+# Calculate the totals for turnover, nestedness, and dissimilarity
+total_turnover <- sum(fdbetaturn)  # Total turnover
+total_nestedness <- sum(fdbetanest)  # Total nestedness
+total_dissimilarity <- sum(fdbeta)  # Total dissimilarity (beta diversity)
+
+# Check that the total dissimilarity matches the sum of turnover and nestedness
+if (abs(total_dissimilarity - (total_turnover + total_nestedness)) > 1e-6) {
+  stop("The sum of turnover and nestedness does not match the total dissimilarity.")
+}
+
+# Calculate the percentage of turnover and nestedness in the total dissimilarity
+percent_turnover <- (total_turnover / total_dissimilarity) * 100
+percent_nestedness <- (total_nestedness / total_dissimilarity) * 100
+
+# Display the results
+cat("Overall turnover percentage:", round(percent_turnover, 2), "%\n")
+cat("Overall nestedness percentage:", round(percent_nestedness, 2), "%\n")
+```
+
+#Beta Taxo Fish
+```{r}
+JAC <- beta.div.comp(jaccard_filtered, quant = FALSE, save.abc = FALSE)
+JAC
+
+JACD <- JAC$D
+JACD
+
+JAC_sim <- 1 - JACD
+
+JACturn <- JAC$repl
+JACnest <- JAC$rich
+```
+
+
+#Alpha FD birds and mammals
+```{r}
+# ---------------------------
+# Load files and clean the data
+# ---------------------------
+matriceeDNA <- read.csv("fiche code 1taxo filtered.csv", row.names = NULL, stringsAsFactors = FALSE)
+bddnils <- read.csv2("bddnils.csv", stringsAsFactors = FALSE, fileEncoding = "UTF-8")
+
+# Clean the List.E column in matriceeDNA
+matriceeDNA$List.E <- gsub("_", ".", matriceeDNA$List.E)           # Replace underscores with dots
+matriceeDNA$List.E <- gsub(" ", ".", matriceeDNA$List.E)           # Replace spaces with dots
+matriceeDNA$List.E <- gsub("\\s*\\(.*?\\)", "", matriceeDNA$List.E)  # Remove annotations in parentheses
+matriceeDNA$List.E <- gsub("\\d+", "", matriceeDNA$List.E)           # Remove numbers
+matriceeDNA$List.E <- gsub("\\s*,\\s*", ",", matriceeDNA$List.E)     # Clean spaces around commas
+
+get_info_from_listE <- function(listE_string, bddnils) {
+  # Initialize result columns with default (NA) values
+  default <- data.frame(Pos_guild = NA, Use_guild2 = NA, trophic_guild = NA, LTq5 = NA)
+  
+  # Split the string into species separated by commas
+  species_list <- unlist(strsplit(listE_string, ","))
+  
+  # Extract matching rows from bddnils
+  matching_rows <- bddnils[bddnils$name %in% species_list, ]
+  
+  if (nrow(matching_rows) > 0) {
+    # For each column, if all values are identical, keep them
+    result <- sapply(colnames(default), function(col) {
+      col_values <- matching_rows[[col]]
+      if (length(unique(col_values)) == 1) {
+        return(unique(col_values))
+      } else {
+        return(NA)
+      }
+    })
+    return(as.data.frame(as.list(result)))
+  }
+  return(default)
+}
+
+# Apply the function to each row of matriceeDNA
+result <- do.call(rbind, lapply(matriceeDNA$List.E, get_info_from_listE, bddnils = bddnils))
+
+# Add columns from bddnils to matriceeDNA
+matriceeDNA <- cbind(matriceeDNA, result)
+
+# Save the final file if needed
+write.csv(matriceeDNA, "output.csv", row.names = FALSE)
+```
+
+##FISH
+```{r}
+# ---------------------------
+# Calculation of functional diversity indices for Fish
+# ---------------------------
+
+# Filter by class: Fish (Actinopterygii)
+matriceeDNA_fish <- matriceeDNA[matriceeDNA$Class == "Actinopterygii", ]
+
+# Create trait matrix for fish
+# Here, we assume the "Taxonomie" column is the species identifier
+sp_tr_fish <- matriceeDNA_fish[, c(9, 15:18)]
+rownames(sp_tr_fish) <- sp_tr_fish$Taxonomie
+sp_tr_fish <- sp_tr_fish[,-1]
+
+# Convert traits to factors or numerics
+sp_tr_fish$Pos_guild <- factor(sp_tr_fish$Pos_guild)
+sp_tr_fish$Use_guild2 <- factor(sp_tr_fish$Use_guild2)
+sp_tr_fish$trophic_guild <- factor(sp_tr_fish$trophic_guild)
+sp_tr_fish$LTq5 <- as.numeric(sp_tr_fish$LTq5)
+
+# Define trait types
+trait_cat_fish <- data.frame(
+  trait_name = names(sp_tr_fish),
+  trait_type = sapply(names(sp_tr_fish), function(trait) {
+    if (trait %in% c("Pos_guild", "Use_guild2", "trophic_guild")) return("N")
+    if (trait == "LTq5") return("Q")
+    return("F")
+  })
+)
+print(trait_cat_fish)
+
+# Calculate functional distances and functional space
+list_fish_sp_dist <- mFD::funct.dist(sp_tr = sp_tr_fish, tr_cat = trait_cat_fish, 
+                                     metric = "gower", scale_euclid = "range", stop_if_NA = FALSE)
+list_fish_fspaces_quality <- mFD::quality.fspaces(list_fish_sp_dist, maxdim_pcoa = 10, 
+                                                  deviation_weighting = "absolute", fdist_scaling = FALSE, 
+                                                  fdendro = "average")
+list_fish_sp_faxes_coord <- list_fish_fspaces_quality$details_fspaces$sp_pc_coord
+
+# Prepare the abundance/presence matrix (community matrix)
+PAeDNA <- read.csv("fiche code 1taxo filtered.csv", row.names = 9, stringsAsFactors = FALSE)
+PAeDNA <- PAeDNA[, c(9:13)]
+jaccard <- t(PAeDNA)
+
+# Function to replace dots between characters with underscores
+replace_dots_between_chars <- function(names_vector) {
+  sapply(names_vector, function(name) {
+    gsub("(?<=\\S)\\.(?=\\S)", "_", name, perl = TRUE)
+  })
+}
+colnames(jaccard) <- replace_dots_between_chars(colnames(jaccard))
+rownames(jaccard) <- replace_dots_between_chars(rownames(jaccard))
+print(jaccard)
+
+# Filter columns (species) corresponding to fish
+sp_names_fish <- rownames(list_fish_sp_faxes_coord)
+jaccard_filtered_fish <- jaccard[, colnames(jaccard) %in% sp_names_fish]
+print(jaccard_filtered_fish)
+asb_sp_w_fish <- as.matrix(jaccard_filtered_fish)
+
+# Compute functional diversity indices for fish
+list_fish_alpha_fd_indices <- mFD::alpha.fd.multidim(list_fish_sp_faxes_coord[, c("PC1", "PC2","PC3","PC4","PC5")],
+                                                     asb_sp_w = asb_sp_w_fish, scaling = FALSE,
+                                                     check_input = TRUE, details_returned = TRUE, verbose = TRUE)
+list_fish_fd_ind_values <- list_fish_alpha_fd_indices$functional_diversity_indices
+fric_values_fish <- list_fish_fd_ind_values$fric
+names(fric_values_fish) <- rownames(list_fish_fd_ind_values)
+print(fric_values_fish)
+
+#### BETA: fish only
+
+# Phylogenetic data
+PAtaxa=read.csv('fiche code 2 filtered.csv', row.names = NULL, stringsAsFactors = FALSE)
+
+test_taxa_list = tibble::tibble(
+  species = PAtaxa$Taxonomie,
+  genus = PAtaxa$Genus,
+  family = PAtaxa$Family,
+  order = PAtaxa$Order
+)
+sp.list <- test_taxa_list %>%
+  dplyr::select(species, genus, family) %>%
+  dplyr::mutate(
+    species.relative = NA,
+    genus.relative = NA
+  )
+
+result <- phylo.maker(sp.list, megatree_fish, gen.list_fish, nodes.type = 1, scenario = 3)
+phylo_fish <- result$phylo
+comm_fish <- jaccard_filtered_fish
+
+unifrac <- unifrac(comm_fish, phylo_fish)
+unifrac
+unifrac_sim_fish <- 1 - unifrac
+phylobeta <- phylo.beta.pair(comm_fish, phylo_fish, index.family = "jaccard")
+phylobeta
+phylobetaturn_fish <- phylobeta$phylo.beta.jtu
+phylobetanest_fish <- phylobeta$phylo.beta.jne
+
+# Global sums for turnover, nestedness, and total dissimilarity
+total_turnover <- sum(phylobetaturn_fish)  # Total turnover contribution
+total_nestedness <- sum(phylobetanest_fish)  # Total nestedness contribution
+total_dissimilarity <- total_turnover + total_nestedness  # Total dissimilarity
+
+# Calculate percentages
+percent_turnover <- (total_turnover / total_dissimilarity) * 100
+percent_nestedness <- (total_nestedness / total_dissimilarity) * 100
+
+# Display results
+cat("Global percentage of turnover (phylo.beta.jtu):", round(percent_turnover, 2), "%\n")
+cat("Global percentage of nestedness (phylo.beta.jne):", round(percent_nestedness, 2), "%\n")
+
+# Functional beta diversity
+
+# Select only the first five dimensions for the functional traits
+list_100_sp_faxes_coord_5D_fish <- list_fish_sp_faxes_coord[, 1:3]
+
+# Desired order of stations
+station_order <- c("STATION_1", "STATION_2", "STATION_3", "STATION_4", "STATION_5")
+
+# Reorder rows of 'asb_sp_w' according to station order
+asb_sp_w_fish <- asb_sp_w_fish[station_order, ]
+
+# Re-run the function with reduced dimensions
+gc()
+fdbeta <- beta.fd.multidim(
+  sp_faxes_coord = list_100_sp_faxes_coord_5D_fish,
+  asb_sp_occ = asb_sp_w_fish,
+  check_input = TRUE,
+  beta_family = "Jaccard",
+  details_returned = TRUE,
+  betapart_step = TRUE,
+  betapart_chullopt = list(conv1 = "Qt", conv2 = "QJ"),
+  betapart_para = FALSE,
+  betapart_para_opt = betapart::beta.para.control()
+)
+
+fdbeta <- fdbeta$pairasb_fbd_indices
+fdbetaturn_fish <- fdbeta$jac_turn
+fdbetanest_fish <- fdbeta$jac_nest
+
+fdbeta <- fdbeta$jac_diss
+fdbeta
+
+fdbeta_sim_fish <- 1 - fdbeta
+
+# Total calculations for turnover, nestedness, and dissimilarity
+total_turnover <- sum(fdbetaturn_fish)  # Total turnover
+total_nestedness <- sum(fdbetanest_fish)  # Total nestedness
+total_dissimilarity <- sum(fdbeta)  # Total dissimilarity (beta diversity)
+
+# Check that dissimilarity is the sum of turnover and nestedness
+if (abs(total_dissimilarity - (total_turnover + total_nestedness)) > 1e-6) {
+  stop("Sum of turnover and nestedness does not match total dissimilarity.")
+}
+
+# Calculate percentages
+percent_turnover <- (total_turnover / total_dissimilarity) * 100
+percent_nestedness <- (total_nestedness / total_dissimilarity) * 100
+
+# Display results
+cat("Global percentage of turnover:", round(percent_turnover, 2), "%\n")
+cat("Global percentage of nestedness:", round(percent_nestedness, 2), "%\n")
+
+JAC <- beta.div.comp(jaccard_filtered_fish, quant = FALSE, save.abc = FALSE)
+JAC
+
+JACD <- JAC$D
+JACD
+
+JAC_sim_fish <- 1 - JACD
+
+JACturn_fish <- JAC$repl
+JACnest_fish <- JAC$rich
+```
+
+
+#BIRDS
+```{r}
+# ---------------------------
+# Indices computation for BIRDS (Aves) via AVONET
+# ---------------------------
+
+# Filter birds
+matriceeDNA_birds <- matriceeDNA[matriceeDNA$Class == "Aves", ]
+
+### Retrieve info from avonet
+data("elton_birds")
+
+matriceeDNA_birds$List.E <- ifelse(is.na(matriceeDNA_birds$List.E) | matriceeDNA_birds$List.E == "", 
+                                   matriceeDNA_birds$Taxonomie, 
+                                   matriceeDNA_birds$List.E)
+
+# Function to retrieve traits from elton_birds based on List.E
+get_traits_from_listE <- function(listE_string, elton_birds) {
+  default <- data.frame(
+    BodyMass.Value = NA, 
+    Diet.Inv = NA, 
+    Diet.Vfish = NA, 
+    Diet.PlantO = NA, 
+    Diet.Scav = NA, 
+    ForStrat.canopy = NA, 
+    ForStrat.aerial = NA
+  )
+  
+  # Clean species names
+  species_list <- unlist(strsplit(listE_string, ","))
+  species_list <- trimws(species_list)
+  species_list <- gsub("\\_", " ", species_list)  
+  species_list <- gsub("\\.", " ", species_list)  
+
+  # Match species in elton_birds
+  matching_rows <- elton_birds[elton_birds$scientificNameStd %in% species_list, ]
+
+  if (nrow(matching_rows) == 0) {
+    cat("⚠️ No match found for:", listE_string, "\n")
+    return(default)
+  }
+
+  # Retrieve traits for each column
+  result <- sapply(colnames(default), function(trait) {
+    trait_values <- matching_rows[[trait]]
+    if (length(unique(trait_values)) == 1) {
+      return(unique(trait_values))
+    } else {
+      return(NA)
+    }
+  })
+  
+  return(as.data.frame(as.list(result)))
+}
+
+# Apply the function on each row of matriceeDNA_birds to retrieve traits from elton_birds
+result_traits <- do.call(rbind, lapply(matriceeDNA_birds$List.E, get_traits_from_listE, elton_birds = elton_birds))
+
+# Add retrieved trait columns to the bird dataframe
+matriceeDNA_birds <- cbind(matriceeDNA_birds, result_traits)
+
+# Build trait matrix for birds with the new traits
+sp_tr_birds <- matriceeDNA_birds[, c(9,19:25)]
+rownames(sp_tr_birds) <- sp_tr_birds$Taxonomie
+sp_tr_birds <- sp_tr_birds[, -1]
+
+# Convert qualitative traits to factors
+sp_tr_birds$Diet.Inv <- as.factor(sp_tr_birds$Diet.Inv)
+sp_tr_birds$Diet.Vfish <- as.factor(sp_tr_birds$Diet.Vfish)
+sp_tr_birds$Diet.PlantO <- as.factor(sp_tr_birds$Diet.PlantO)
+sp_tr_birds$Diet.Scav <- as.factor(sp_tr_birds$Diet.Scav)
+sp_tr_birds$ForStrat.canopy <- as.factor(sp_tr_birds$ForStrat.canopy)
+sp_tr_birds$ForStrat.aerial <- as.factor(sp_tr_birds$ForStrat.aerial)
+
+# Create dataframe indicating trait type (Q for quantitative, N for qualitative)
+trait_cat_birds <- data.frame(
+  trait_name = names(sp_tr_birds),
+  trait_type = c("Q", "N", "N", "N", "N", "N", "N")
+)
+
+# Compute functional distances and functional space for birds
+list_birds_sp_dist <- mFD::funct.dist(sp_tr = sp_tr_birds, tr_cat = trait_cat_birds, 
+                                      metric = "gower", scale_euclid = "range", stop_if_NA = FALSE)
+
+# Compute functional space quality
+list_birds_fspaces_quality <- mFD::quality.fspaces(list_birds_sp_dist, maxdim_pcoa = 10, 
+                                                   deviation_weighting = "absolute", fdist_scaling = FALSE, 
+                                                   fdendro = "average")
+list_birds_sp_faxes_coord <- list_birds_fspaces_quality$details_fspaces$sp_pc_coord
+
+# Display the functional space
+print(list_birds_sp_faxes_coord)
+
+# Prepare community matrix for birds
+PAeDNA_birds <- PAeDNA
+jaccard_birds <- t(PAeDNA_birds)
+colnames(jaccard_birds) <- replace_dots_between_chars(colnames(jaccard_birds))
+rownames(jaccard_birds) <- replace_dots_between_chars(rownames(jaccard_birds))
+
+# Filter bird species present in the functional space
+sp_names_birds <- rownames(list_birds_sp_faxes_coord)
+jaccard_filtered_birds <- jaccard_birds[, colnames(jaccard_birds) %in% sp_names_birds]
+asb_sp_w_birds <- as.matrix(jaccard_filtered_birds)
+
+# Compute functional diversity indices for birds
+list_birds_alpha_fd_indices <- mFD::alpha.fd.multidim(list_birds_sp_faxes_coord[, c("PC1", "PC2", "PC3", "PC4", "PC5")],
+                                                      asb_sp_w = asb_sp_w_birds, scaling = FALSE,
+                                                      check_input = TRUE, details_returned = TRUE, verbose = TRUE)
+list_birds_fd_ind_values <- list_birds_alpha_fd_indices$functional_diversity_indices
+fric_values_birds <- list_birds_fd_ind_values$fric
+names(fric_values_birds) <- rownames(list_birds_fd_ind_values)
+
+# Display results
+print(fric_values_birds)
+
+#### BETA : birds only
+## Phylo
+result <- phylo.maker(sp.list, megatree_oi, gen.list_oi, nodes.type = 1, scenario = 3)
+result
+phylo_birds <- result$phylo
+
+comm_birds <- jaccard_filtered_birds
+
+unifrac <- unifrac(comm_birds, phylo_birds)
+unifrac
+
+unifrac_sim_birds <- 1 - unifrac
+phylobeta <- phylo.beta.pair(comm_birds, phylo_birds, index.family = "jaccard")
+phylobeta
+phylobetaturn_birds <- phylobeta$phylo.beta.jtu
+phylobetanest_birds <- phylobeta$phylo.beta.jne
+
+# Global sums for turnover, nestedness, and total dissimilarity
+total_turnover <- sum(phylobetaturn_birds)  # Total turnover contribution
+total_nestedness <- sum(phylobetanest_birds)  # Total nestedness contribution
+total_dissimilarity <- total_turnover + total_nestedness  # Total dissimilarity
+
+# Compute percentages
+percent_turnover <- (total_turnover / total_dissimilarity) * 100
+percent_nestedness <- (total_nestedness / total_dissimilarity) * 100
+
+# Display results
+cat("Global percentage of turnover (phylo.beta.jtu):", round(percent_turnover, 2), "%\n")
+cat("Global percentage of nestedness (phylo.beta.jne):", round(percent_nestedness, 2), "%\n")
+
+# Select only the first five dimensions for functional traits
+list_100_sp_faxes_coord_5D_birds <- list_birds_sp_faxes_coord[, 1:3]
+
+# Desired station order
+station_order <- c("STATION_1", "STATION_2", "STATION_3", "STATION_4", "STATION_5")
+
+# Rearrange rows of 'asb_sp_w' according to station order
+asb_sp_w_birds <- asb_sp_w_birds[station_order, ]
+
+# Re-run the function with reduced dimensions
+gc()
+fdbeta <- beta.fd.multidim(
+  sp_faxes_coord = list_100_sp_faxes_coord_5D_birds,
+  asb_sp_occ = asb_sp_w_birds,
+  check_input = TRUE,
+  beta_family = "Jaccard",
+  details_returned = TRUE,
+  betapart_step = TRUE,
+  betapart_chullopt = list(conv1 = "Qt", conv2 = "QJ"),
+  betapart_para = FALSE,
+  betapart_para_opt = betapart::beta.para.control()
+)
+
+fdbeta <- fdbeta$pairasb_fbd_indices
+fdbetaturn_birds <- fdbeta$jac_turn
+fdbetanest_birds <- fdbeta$jac_nest
+
+fdbeta <- fdbeta$jac_diss
+fdbeta
+
+fdbeta_sim_birds <- 1 - fdbeta
+
+# Total calculations for turnover, nestedness, and dissimilarity
+total_turnover <- sum(fdbetaturn_birds)  # Total turnover
+total_nestedness <- sum(fdbetanest_birds)  # Total nestedness
+total_dissimilarity <- sum(fdbeta)  # Total beta diversity (dissimilarity)
+
+# Check that total dissimilarity matches turnover + nestedness
+if (abs(total_dissimilarity - (total_turnover + total_nestedness)) > 1e-6) {
+  stop("The sum of turnover and nestedness does not match total dissimilarity.")
+}
+
+# Compute percentages
+percent_turnover <- (total_turnover / total_dissimilarity) * 100
+percent_nestedness <- (total_nestedness / total_dissimilarity) * 100
+
+# Display results
+cat("Global percentage of turnover:", round(percent_turnover, 2), "%\n")
+cat("Global percentage of nestedness:", round(percent_nestedness, 2), "%\n")
+
+JAC <- beta.div.comp(jaccard_filtered_birds, quant = FALSE, save.abc = FALSE)
+JAC
+
+JACD <- JAC$D
+JACD
+
+JAC_sim_birds <- 1 - JACD
+
+JACturn_birds <- JAC$repl
+JACnest_birds <- JAC$rich
+```
+
+#MAMMALS
+```{r}
+# ---------------------------
+# Index calculation for MAMMALS (Mammalia) via PanTHERIA
+# ---------------------------
+# Filter mammals
+matriceeDNA_mammals <- matriceeDNA[matriceeDNA$Class == "Mammalia", ]
+
+data("elton_mammals")
+
+# Retrieve traits from elton_mammals
+matriceeDNA_mammals$List.E <- ifelse(is.na(matriceeDNA_mammals$List.E) | matriceeDNA_mammals$List.E == "", 
+                                matriceeDNA_mammals$Taxonomie, 
+                                matriceeDNA_mammals$List.E)
+
+# Function to retrieve traits for each species list
+get_traits_from_listE_mammals <- function(listE_string, elton_mammals) {
+  default <- data.frame(BodyMass = NA, 
+                        Diet.Inv = NA, 
+                        Diet.Vfish = NA, 
+                        Diet.PlantO = NA, 
+                        Activity.Nocturnal = NA)
+  
+  species_list <- unlist(strsplit(listE_string, ","))
+  species_list <- trimws(species_list)
+  species_list <- gsub("\\_", " ", species_list)  
+  species_list <- gsub("\\.", " ", species_list)  
+
+  matching_rows <- elton_mammals[elton_mammals$scientificNameStd %in% species_list, ]
+
+  if (nrow(matching_rows) == 0) {
+    cat("⚠️ No match found for:", listE_string, "\n")
+    return(default)
+  }
+
+  result <- sapply(colnames(default), function(trait) {
+    trait_values <- matching_rows[[trait]]
+    if (length(unique(trait_values)) == 1) {
+      return(unique(trait_values))
+    } else {
+      return(NA)
+    }
+  })
+  return(as.data.frame(as.list(result)))
+}
+
+# Apply the function to each row of matriceeDNA_mammals to retrieve traits from elton_mammals
+result_traits_mammals <- do.call(rbind, lapply(matriceeDNA_mammals$List.E, get_traits_from_listE_mammals, elton_mammals = elton_mammals))
+
+# Add retrieved trait columns to the mammal dataframe
+matriceeDNA_mammals <- cbind(matriceeDNA_mammals, result_traits_mammals)
+
+# Build the trait matrix for mammals
+sp_tr_mammals <- matriceeDNA_mammals[, c(9,20:23)]
+rownames(sp_tr_mammals) <- sp_tr_mammals$Taxonomie
+sp_tr_mammals <- sp_tr_mammals[, -1]
+
+# Convert qualitative variables to factors
+sp_tr_mammals$Diet.Inv <- as.factor(sp_tr_mammals$Diet.Inv)
+sp_tr_mammals$Diet.Vfish <- as.factor(sp_tr_mammals$Diet.Vfish)
+sp_tr_mammals$Diet.PlantO <- as.factor(sp_tr_mammals$Diet.PlantO)
+sp_tr_mammals$Activity.Nocturnal <- as.factor(sp_tr_mammals$Activity.Nocturnal)
+
+# Create the trait type dataframe
+trait_cat_mammals <- data.frame(
+  trait_name = names(sp_tr_mammals),
+  trait_type = c("F", "F", "F", "Q")  # "Q" for BodyMass, "F" for qualitative traits
+)
+
+sp_tr_mammals$Activity.Nocturnal <- as.numeric(as.character(sp_tr_mammals$Activity.Nocturnal))
+# Check levels of qualitative variables
+str(sp_tr_mammals)
+
+# Compute functional distances and functional space for mammals
+list_mammals_sp_dist <- mFD::funct.dist(sp_tr = sp_tr_mammals, tr_cat = trait_cat_mammals, 
+                                         metric = "gower", scale_euclid = "range", stop_if_NA = FALSE)
+
+list_mammals_fspaces_quality <- mFD::quality.fspaces(list_mammals_sp_dist, maxdim_pcoa = 10, 
+                                                     deviation_weighting = "absolute", fdist_scaling = FALSE, 
+                                                     fdendro = "average")
+list_mammals_sp_faxes_coord <- list_mammals_fspaces_quality$details_fspaces$sp_pc_coord
+
+# Prepare the community matrix for mammals
+PAeDNA_mammals <- PAeDNA
+jaccard_mammals <- t(PAeDNA_mammals)
+colnames(jaccard_mammals) <- replace_dots_between_chars(colnames(jaccard_mammals))
+rownames(jaccard_mammals) <- replace_dots_between_chars(rownames(jaccard_mammals))
+
+# Filter mammal species present in the functional space
+sp_names_mammals <- rownames(list_mammals_sp_faxes_coord)
+jaccard_filtered_mammals <- jaccard_mammals[, colnames(jaccard_mammals) %in% sp_names_mammals]
+asb_sp_w_mammals <- as.matrix(jaccard_filtered_mammals)
+
+# Compute functional diversity indices for mammals
+list_mammals_alpha_fd_indices <- mFD::alpha.fd.multidim(list_mammals_sp_faxes_coord[, c("PC1", "PC2", "PC3", "PC4", "PC5")],
+                                                         asb_sp_w = asb_sp_w_mammals, scaling = FALSE,
+                                                         check_input = TRUE, details_returned = TRUE, verbose = TRUE)
+list_mammals_fd_ind_values <- list_mammals_alpha_fd_indices$functional_diversity_indices
+fric_values_mammals <- list_mammals_fd_ind_values$fric
+names(fric_values_mammals) <- rownames(list_mammals_fd_ind_values)
+print(fric_values_mammals)
+
+#### BETA: fish only
+## Phylo
+result <- phylo.maker(sp.list, megatree_mm, gen.list_mm, nodes.type = 1, scenario = 3)
+result
+phylo_mammals <- result$phylo
+
+comm_mammals <- jaccard_filtered_mammals
+
+
+unifrac <- unifrac(comm_mammals, phylo_mammals)
+unifrac
+
+unifrac_sim_mammals <- 1 - unifrac
+
+phylobeta <- phylo.beta.pair(comm_mammals, phylo_mammals, index.family = "jaccard")
+phylobeta
+phylobetaturn_mammals <- phylobeta$phylo.beta.jtu
+phylobetanest_mammals <- phylobeta$phylo.beta.jne
+
+# Global sums for turnover, nestedness, and total dissimilarity
+total_turnover <- sum(phylobetaturn_mammals)  # Total turnover contribution
+total_nestedness <- sum(phylobetanest_mammals)  # Total nestedness contribution
+total_dissimilarity <- total_turnover + total_nestedness  # Total dissimilarity
+
+# Percentage calculations
+percent_turnover <- (total_turnover / total_dissimilarity) * 100
+percent_nestedness <- (total_nestedness / total_dissimilarity) * 100
+
+# Display results
+cat("Global turnover percentage (phylo.beta.jtu):", round(percent_turnover, 2), "%\n")
+cat("Global nestedness percentage (phylo.beta.jne):", round(percent_nestedness, 2), "%\n")
+
+# Select only the first five dimensions for the functional traits
+list_100_sp_faxes_coord_5D_mammals <- list_mammals_sp_faxes_coord[, 1:3]
+
+# Desired station order
+station_order <- c("STATION_1", "STATION_2", "STATION_3", "STATION_4", "STATION_5")
+
+# Reorder rows of 'asb_sp_w' according to the station order
+asb_sp_w_mammals <- asb_sp_w_mammals[station_order, ]
+
+# Re-run the function with reduced dimensions
+gc()
+fdbeta <- beta.fd.multidim(
+  sp_faxes_coord = list_100_sp_faxes_coord_5D_mammals,
+  asb_sp_occ = asb_sp_w_mammals,
+  check_input = TRUE,
+  beta_family = "Jaccard",
+  details_returned = TRUE,
+  betapart_step = TRUE,
+  betapart_chullopt = list(conv1 = "Qt", conv2 = "QJ"),
+  betapart_para = FALSE,
+  betapart_para_opt = betapart::beta.para.control()
+)
+
+fdbeta <- fdbeta$pairasb_fbd_indices
+fdbetaturn_mammals <- fdbeta$jac_turn
+fdbetanest_mammals <- fdbeta$jac_nest
+
+fdbeta <- fdbeta$jac_diss
+fdbeta
+
+fdbeta_sim_mammals <- 1 - fdbeta
+
+# Compute totals for turnover, nestedness and dissimilarity
+total_turnover <- sum(fdbetaturn_mammals)  # Total turnover
+total_nestedness <- sum(fdbetanest_mammals)  # Total nestedness
+total_dissimilarity <- sum(fdbeta)  # Total dissimilarity (beta diversity)
+
+# Check that total dissimilarity is the sum of turnover and nestedness
+if (abs(total_dissimilarity - (total_turnover + total_nestedness)) > 1e-6) {
+  stop("The sum of turnover and nestedness does not match the total dissimilarity.")
+}
+
+# Calculate percentages
+percent_turnover <- (total_turnover / total_dissimilarity) * 100
+percent_nestedness <- (total_nestedness / total_dissimilarity) * 100
+
+# Display results
+cat("Global turnover percentage:", round(percent_turnover, 2), "%\n")
+cat("Global nestedness percentage:", round(percent_nestedness, 2), "%\n")
+
+JAC <- beta.div.comp(jaccard_filtered_mammals, quant = FALSE, save.abc = FALSE)
+JAC
+
+JACD <- JAC$D
+JACD
+
+JAC_sim_mammals <- 1 - JACD
+
+JACturn_mammals <- JAC$repl
+JACnest_mammals <- JAC$rich
+```
+
+#PCA
+```{r}
+# Function to calculate mean pairwise β-diversity for each station
+mean_pairwise_beta <- function(mat) {
+  mat <- as.matrix(mat)
+  station_means <- rowMeans(mat, na.rm = TRUE)  # Mean of each row
+  return(station_means)
+}
+
+# Apply the function to each β-diversity matrix
+Bjne_Phyl_fish <- mean_pairwise_beta(phylobetanest_fish)
+Bjne_Phyl_birds <- mean_pairwise_beta(phylobetanest_birds)
+Bjne_Phyl_mammals <- mean_pairwise_beta(phylobetanest_mammals)
+
+Bjtu_Phyl_fish <- mean_pairwise_beta(phylobetaturn_fish)
+Bjtu_Phyl_birds <- mean_pairwise_beta(phylobetaturn_birds)
+Bjtu_Phyl_mammals <- mean_pairwise_beta(phylobetaturn_mammals)
+
+Bjtu_Func_fish <- mean_pairwise_beta(fdbetaturn_fish)
+Bjtu_Func_birds <- mean_pairwise_beta(fdbetaturn_birds)
+Bjtu_Func_mammals <- mean_pairwise_beta(fdbetaturn_mammals)
+
+Bjne_Func_fish <- mean_pairwise_beta(fdbetanest_fish)
+Bjne_Func_birds <- mean_pairwise_beta(fdbetanest_birds)
+Bjne_Func_mammals <- mean_pairwise_beta(fdbetanest_mammals)
+
+Bjtu_Tax_fish <- mean_pairwise_beta(JACturn_fish)
+Bjtu_Tax_birds <- mean_pairwise_beta(JACturn_birds)
+Bjtu_Tax_mammals <- mean_pairwise_beta(JACturn_mammals)
+
+Bjne_Tax_fish <- mean_pairwise_beta(JACnest_fish)
+Bjne_Tax_birds <- mean_pairwise_beta(JACnest_birds)
+Bjne_Tax_mammals <- mean_pairwise_beta(JACnest_mammals)
+
+# Combine the mean β-diversity matrices into a single matrix
+combined_matrix <- cbind(Bjne_Phyl_fish, Bjne_Phyl_birds, Bjne_Phyl_mammals, Bjtu_Phyl_fish, Bjtu_Phyl_birds, Bjtu_Phyl_mammals, Bjtu_Func_fish, Bjtu_Func_birds, Bjtu_Func_mammals, Bjne_Func_fish, Bjne_Func_birds, Bjne_Func_mammals, Bjtu_Tax_fish, Bjtu_Tax_birds, Bjtu_Tax_mammals, Bjne_Tax_fish, Bjne_Tax_birds, Bjne_Tax_mammals)
+combined_matrix
+
+# Station names
+statnam <- c("Station 1", "Station 2", "Station 3", "Station 4", "Station 5")
+
+res.pca <- prcomp(combined_matrix)
+RES.PCA <- fviz_pca_biplot(res.pca, habillage = statnam, labelsize = 5, repel = TRUE, legend.title = "Sample", title = NULL) +
+  theme(text = element_text(size = 15))
+RES.PCA
+
+# Define station names
+statnam <- c("Station 1", "Station 2", "Station 3", "Station 4", "Station 5")
+
+# Create submatrices for each taxonomic group
+combined_matrix_fish <- cbind(Bjne_Phyl_fish, Bjtu_Phyl_fish, Bjtu_Func_fish, Bjne_Func_fish, Bjtu_Tax_fish, Bjne_Tax_fish)
+combined_matrix_birds <- cbind(Bjne_Phyl_birds, Bjtu_Phyl_birds, Bjtu_Func_birds, Bjne_Func_birds, Bjtu_Tax_birds, Bjne_Tax_birds)
+combined_matrix_mammals <- cbind(Bjne_Phyl_mammals, Bjtu_Phyl_mammals, Bjtu_Func_mammals, Bjne_Func_mammals, Bjtu_Tax_mammals, Bjne_Tax_mammals)
+
+# Perform PCA for each taxon
+res.pca_fish <- prcomp(combined_matrix_fish, scale = TRUE)
+res.pca_birds <- prcomp(combined_matrix_birds, scale = TRUE)
+res.pca_mammals <- prcomp(combined_matrix_mammals, scale = TRUE)
+
+# Extract station names from rownames and format them
+station_labels_fish <- factor(gsub("STATION_", "Station ", rownames(combined_matrix_fish)))
+station_labels_birds <- factor(gsub("STATION_", "Station ", rownames(combined_matrix_birds)))
+station_labels_mammals <- factor(gsub("STATION_", "Station ", rownames(combined_matrix_mammals)))
+
+# Function for publication-ready PCA biplots
+plot_pca <- function(res_pca, station_labels, panel_title) {
+  fviz_pca_biplot(
+    res_pca,
+    habillage = station_labels,
+    addEllipses = TRUE,       # to visualize groups
+    label = "var",            # show only variable vectors
+    labelsize = 4,
+    repel = TRUE,
+    col.var = "black",
+    col.ind = "black",
+    legend.title = "Station"
+  ) +
+    ggtitle(panel_title) +
+    theme_classic(base_size = 12) +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+      legend.position = "bottom",
+      legend.title = element_text(face = "bold")
+    )
+}
+
+# Create the three PCA plots
+pca_fish_plot <- plot_pca(res.pca_fish, station_labels_fish, "Fish")
+pca_birds_plot <- plot_pca(res.pca_birds, station_labels_birds, "Birds")
+pca_mammals_plot <- plot_pca(res.pca_mammals, station_labels_mammals, "Mammals")
+
+# Combine the plots
+combined_plot <- grid.arrange(
+  pca_fish_plot,
+  arrangeGrob(pca_birds_plot, pca_mammals_plot, ncol = 2),
+  nrow = 2,
+  heights = c(1.5, 1)
+)
+
+# Save in high resolution for publication
+ggsave(
+  filename = "Fig5.tiff",
+  plot = combined_plot,
+  width = 12,
+  height = 10,
+  units = "in",
+  dpi = 1200,
+  compression = "lzw"
+)
+```
+
+
+##Radar chart
+```{r}
+# Correct the order of the stations
+station_data <- data.frame(
+  Taxo_Richness = c(33, 30, 23, 21, 14),  # Correct order: STATION 1, STATION 2, STATION 3, STATION 4, STATION 5
+  SES_FRic = c(-3.174618, -3.647989, -3.723539 , -2.445128, -4.238288),  # Correct order of SES FRic
+  SES_PD = c(0.2457578, -1.4684707, -0.4042691, 0.7845843, -1.0925467)  # Correct order of SES PD
+)
+
+# Assign row names based on the correct order
+rownames(station_data) <- c("STATION 1", "STATION 2", "STATION 3", "STATION 4", "STATION 5")
+
+# Adding rows for max and min values for radar plot limits
+station_data <- rbind(
+  Max = apply(station_data, 2, max),
+  Min = apply(station_data, 2, min),
+  station_data
+)
+
+# Define colors for the plots
+station_colors <- c("#FF6347", "#4682B4", "#32CD32", "#FFD700", "#9370DB")
+
+# Plot settings
+par(mfrow = c(2, 3))  # Layout of radar plots
+par(mar = c(2, 2, 2, 2))  # Adjust margins for better fit
+
+# Loop through each station to create individual radar charts
+for (i in 3:nrow(station_data)) {  # Starting from the third row, which corresponds to "STATION 1"
+  
+  # Create the radar chart for each station
+  radarchart(
+    station_data[c(1, 2, i), ],  # Selecting the Max, Min, and current station's data
+    axistype = 1,
+    pcol = station_colors[i - 2],  # Unique color for each station
+    pfcol = adjustcolor(station_colors[i - 2], alpha.f = 0.3),  # Adding transparency
+    plwd = 2,  # Line width
+    title = paste(rownames(station_data)[i]),  # Title with station name
+    cglcol = "grey",  # Gridline color
+    axislabcol = "black",  # Axis label color
+    caxislabels = c("Min", "Max"),  # Axis labels
+    vlcex = 0.8  # Adjust the size of the variable labels
+  )
+}
+
+# Save the radar charts to a high-quality image file (1200 dpi)
+png("Fig4.png", width = 12, height = 8, units = "in", res = 1200)
+par(mfrow = c(2, 3))
+par(mar = c(2, 2, 2, 2))
+
+# Loop again to plot and save in the exported file
+for (i in 3:nrow(station_data)) {  # Starting from the third row, which corresponds to "STATION 1"
+  
+  radarchart(
+    station_data[c(1, 2, i), ],  # Selecting the Max, Min, and current station's data
+    axistype = 1,
+    pcol = station_colors[i - 2],  # Unique color for each station
+    pfcol = adjustcolor(station_colors[i - 2], alpha.f = 0.3),  # Adding transparency
+    plwd = 2,  # Line width
+    title = paste(rownames(station_data)[i]),  # Title with station name
+    cglcol = "grey",  # Gridline color
+    axislabcol = "black",  # Axis label color
+    caxislabels = c("Min", "Max"),  # Axis labels
+    vlcex = 0.8  # Adjust the size of the variable labels
+  )
+}
+
+# Close the png device to save the file
+dev.off()
+```
+
+###WFD, AnaCoNor & eDNA
+```{r}
+# Creating the data
+data <- data.frame(
+  Method = rep(c("WFD", "AnaCoNoR", "eDNA"), times = 5),  
+  Category = rep(c("SR", "FRic", "SES.FRic", "PD", "SES.PD"), each = 3),  
+  Value = c(45, 48, 53, 
+            21e-04, 41e-04, 31e-04, 
+            -3.21, -1.31, -2.16, 
+            2964, 2879, 3203, 
+            -0.70, -2.00, -0.68)
+)
+
+# Factors with desired order
+data$Method <- factor(data$Method, levels = c("WFD", "AnaCoNoR", "eDNA"))
+data$Category <- factor(data$Category, levels = c("SR", "FRic", "SES.FRic", "PD", "SES.PD"))
+
+# Final plot
+ggplot(data, aes(x = Method, y = Value, fill = Method)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  facet_wrap(~Category, scales = "free_y", nrow = 1) +  # One row of facets
+  scale_fill_viridis_d(option = "D", end = 0.85, direction = -1) +  # Discrete viridis palette
+  labs(x = NULL, y = "Value") +
+  theme_minimal(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 12, face = "bold"),
+    axis.text.y = element_text(size = 12),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    strip.text = element_text(size = 15, face = "bold"),
+    legend.position = "none",  # ✅ Removes unnecessary color legend
+    panel.grid.major = element_line(size = 0.2),
+    panel.grid.minor = element_blank()
+  )
+
+ggsave("Fig6.tiff", width = 13, height = 4, units = "in", dpi = 1200, compression = "lzw")
+```
+

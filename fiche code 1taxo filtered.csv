@@ -1,0 +1,125 @@
+List E,Category,Class,Order,Family,Subfamily,Genus,Species,Taxonomie,STATION 5,STATION 1,STATION 4,STATION 3,STATION 2
+"Pholis gunnellus, Taurulus bubalis",NA,Actinopterygii,Perciformes,-,-,-,-,Perciformes,0,1,0,0,0
+Anguilla_anguilla_1,DIA,Actinopterygii,Anguilliformes,Anguillidae,-,Anguilla,anguilla,Anguilla_anguilla_1,0,1,0,1,0
+Anguilla_anguilla_2,DIA,Actinopterygii,Anguilliformes,Anguillidae,-,Anguilla,anguilla,Anguilla_anguilla_2,1,0,1,1,1
+Atherina_presbyter,ER,Actinopterygii,Atheriniformes,Atherinidae,Atherininae,Atherina,presbyter,Atherina_presbyter,0,1,1,1,1
+Belone_belone,MS,Actinopterygii,Beloniformes,Belonidae,,Belone,belone,Belone_belone,0,1,1,0,1
+Coryphoblennius_galerita,NA,Actinopterygii,Blenniiformes,Blenniidae,Salariinae,Coryphoblennius,galerita,Coryphoblennius_galerita,0,1,0,0,0
+Lipophrys_pholis,ER,Actinopterygii,Blenniiformes,Blenniidae,Salariinae,Lipophrys,pholis,Lipophrys_pholis,0,1,0,1,1
+Parablennius_gattorugine,ER,Actinopterygii,Blenniiformes,Blenniidae,Salariinae,Parablennius,gattorugine,Parablennius_gattorugine,0,1,1,1,1
+Callionymus_lyra,ER,Actinopterygii,Callionymiformes,Callionymidae,-,Callionymus,lyra,Callionymus_lyra,0,1,1,1,1
+Lepomis_gibbosus,FW,Actinopterygii,Centrarchiformes,Centrarchidae,-,Lepomis,gibbosus,Lepomis_gibbosus,1,0,0,0,0
+Sardina_pilchardus,MJ,Actinopterygii,Clupeiformes,Alosidae,-,Sardina,pilchardus,Sardina_pilchardus,0,1,1,1,1
+"Clupea harengus, Sprattus sprattus",MJ,Actinopterygii,Clupeiformes,Clupeidae,-,-,-,Clupeidae,0,1,1,1,1
+"Gobio gobio, Alburnus alburnus, Alburnoides bipunctatus, Leuciscus leuciscus",NA,Actinopterygii,Cypriniformes,Cyprinidae,-,-,-,Cyprinidae,1,0,0,0,0
+"Leuciscus leuciscus, Leuciscus burdigalensis, Scardinius erythrophtalmus, Rutilus rutilus, Alburnus alburnus, Alburnoides bipunctatus, Tinca tinca",NA,Actinopterygii,Cypriniformes,Cyprinidae,-,-,-,Cyprinidae_1,1,0,0,0,0
+"Tinca tinca, Ctenopharyngodon idella, Scardinius erythrophtalmus",NA,Actinopterygii,Cypriniformes,CYprinidae,-,-,-,Cyprinidae_2,1,0,0,0,0
+"Rutilus rutilus, Alburnus alburnus, Alburnoides bipunctatus, Scardinius erythrophtalmus",NA,Actinopterygii,Cypriniformes,Cyprinidae,-,-,-,Cyprinidae_3,1,0,0,0,0
+"Carassius auratus, Carassius carassius, Carassius gibelio, Cyprinus carpio",FW,Actinopterygii,Cypriniformes,Cyprinidae,Cyprininae,-,-,Cyprininae,1,0,0,0,0
+Cyprinus_carpio,FW,Actinopterygii,Cypriniformes,Cyprinidae,Cyprininae,Cyprinus,carpio,Cyprinus_carpio,1,0,0,0,0
+"Abramis brama, Blicca bjoerkna",FW,Actinopterygii,Cypriniformes,Leuciscidae,Leuciscinae,-,-,Leuciscinae,1,0,0,0,0
+Squalius_cephalus,FW,Actinopterygii,Cypriniformes,Leuciscidae,Leuciscinae,Squalius,cephalus,Squalius_cephalus,1,0,0,0,0
+Barbatula_barbatula,FW,Actinopterygii,Cypriniformes,Nemacheilidae,-,Barbatula,barbatula,Barbatula_barbatula,1,0,0,0,0
+Esox_lucius,FW,Actinopterygii,Esociformes,Esocidae,-,Esox,lucius,Esox_lucius,1,0,0,0,0
+"Ciliata mustela, Ciliata septentrionalis (a), Enchelyopus cimbrius",NA,Actinopterygii,Gadiformes,Gaidropsaridae,-,-,-,Gaidropsaridae,0,0,0,0,1
+Aphia_minuta_1,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Aphia,minuta,Aphia_minuta_1,0,1,0,0,1
+Aphia_minuta_2,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Aphia,minuta,Aphia_minuta_2,0,1,0,0,0
+Gobius_niger,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Gobius,niger,Gobius_niger,0,1,1,1,1
+Gobius_paganellus_1,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Gobius,paganellus,Gobius_paganellus_1,0,0,1,0,0
+Gobius_paganellus_2,ER,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Gobius,paganellus,Gobius_paganellus_2,0,1,0,1,1
+"Pomatoschistus minutus, Pomatoschistus pictus (a)",ER,Actinopterygii,Gobiiformes,Gobiidae,Gobiinae,Pomatoschistus,-,Pomatoschistus_sp._1,0,1,1,1,1
+"Pomatoschistus flavescens, Pomatoschistus pictus (a)",ER,Actinopterygii,Gobiiformes,Gobiidae,Gobionellinae,Pomatoschistus,-,Pomatoschistus_sp._2,0,1,1,1,1
+"Pomatoschistus microps, Pomatoschistus minutus,  Pomatoschistus pictus (a)",ER,Actinopterygii,Gobiiformes,Gobiidae,Gobionellinae,Pomatoschistus,-,Pomatoschistus_sp._3,0,1,1,1,1
+"Chelon labrosus, Chelon ramada, Chelon auratus",NA,Actinopterygii,Mugiliformes,Mugilidae,-,Chelon,-,Chelon_sp.,0,1,1,1,1
+Mullus_surmuletus,MJ,Actinopterygii,Mulliformes,Mullidae,-,Mullus,surmuletus,Mullus_surmuletus,0,1,0,0,1
+"Hyperoplus immaculatus, Hyperoplus lanceolatus, Ammodytes marinus, Ammodytes tobianus",NA,Actinopterygii,Perciformes,Ammodytidae,-,-,-,Ammodytidae_1,0,0,0,0,1
+"Hyperoplus immaculatus, Hyperoplus lanceolatus, Ammodytes marinus, Ammodytes tobianus",NA,Actinopterygii,Perciformes,Ammodytidae,-,-,-,Ammodytidae_2,0,0,0,0,1
+"Hyperoplus immaculatus, Hyperoplus lanceolatus, Ammodytes marinus, Ammodytes tobianus",NA,Actinopterygii,Perciformes,Ammodytidae,-,-,-,Ammodytidae_3,0,1,1,1,1
+Gymnammodytes_semisquamatus,MA,Actinopterygii,Perciformes,Ammodytidae,-,Gymnammodytes,semisquamatus,Gymnammodytes_semisquamatus,0,1,1,1,1
+Centrolabrus_exoletus,MA,Actinopterygii,Perciformes,Labridae,-,Centrolabrus,exoletus,Centrolabrus_exoletus,0,0,0,0,1
+Ctenolabrus_rupestris,MA,Actinopterygii,Perciformes,Labridae,-,Ctenolabrus,rupestris,Ctenolabrus_rupestris,0,1,1,0,1
+Labrus_bergylta,MA,Actinopterygii,Perciformes,Labridae,-,Labrus,bergylta,Labrus_bergylta,0,1,1,1,1
+Symphodus_bailloni,ER,Actinopterygii,Perciformes,Labridae,-,Symphodus,bailloni,Symphodus_bailloni,0,1,1,1,1
+Symphodus_melops,ER,Actinopterygii,Perciformes,Labridae,-,Symphodus,melops,Symphodus_melops,0,1,0,1,1
+Dicentrarchus_labrax,MJ,Actinopterygii,Perciformes,Moronidae,-,Dicentrarchus,labrax,Dicentrarchus_labrax,0,1,1,1,1
+"Perca fluviatilis, Sander lucioperca",FW,Actinopterygii,Perciformes,Percidae,-,-,-,Percidae,1,0,0,0,0
+Gymnocephalus_cernua,FW,Actinopterygii,Perciformes,Percidae,Percinae,Gymnocephalus,cernua,Gymnocephalus_cernua,1,0,0,0,0
+Pholis_gunnellus,MA,Actinopterygii,Perciformes,Pholidae,Pholinae,Pholis,gunnellus,Pholis_gunnellus,0,1,0,0,0
+Scomber_scombrus,MA,Actinopterygii,Perciformes,Scombridae,Scombrinae,Scomber,scombrus,Scomber_scombrus,0,1,1,0,1
+"Diplodus sargus, Diplodus vulgaris (a)",MJ,Actinopterygii,Perciformes,Sparidae,-,Diplodus,-,Diplodus_sp.,0,1,0,0,0
+Sparus_aurata,MA,Actinopterygii,Perciformes,Sparidae,-,Sparus,aurata,Sparus_aurata,0,1,1,1,1
+Spondyliosoma_cantharus_1,MJ,Actinopterygii,Perciformes,Sparidae,-,Spondyliosoma,cantharus,Spondyliosoma_cantharus_1,1,1,0,0,1
+Spondyliosoma_cantharus_2,MJ,Actinopterygii,Perciformes,Sparidae,-,Spondyliosoma,cantharus,Spondyliosoma_cantharus_2,0,0,0,1,0
+Arnoglossus_laterna,MA,Actinopterygii,Pleuronectiformes,Bothidae,-,Arnoglossus,laterna,Arnoglossus_laterna,0,1,0,0,0
+"Limanda limanda, Pleuronectes platessa, Platichthys flesus, Glyptocephalus cynoglossus, Hippoglossoides platessoides, Hippoglossus hippoglossus, Microstomus kitt",NA,Actinopterygii,Pleuronectiformes,Pleuronectidae,-,-,-,Pleuronectidae,0,1,1,1,1
+"Zeugopterus punctatus, Zeugopterus regius",NA,Actinopterygii,Pleuronectiformes,Scophthalmidae,-,Zeugopterus,-,Zeugopterus_sp._,0,0,0,1,0
+Pegusa_lascaris,MA,Actinopterygii,Pleuronectiformes,Soleidae,-,Pegusa,lascaris,Pegusa_lascaris,0,0,0,0,1
+Solea_solea,MJ,Actinopterygii,Pleuronectiformes,Soleidae,-,Solea,solea,Solea_solea,0,1,1,1,1
+Salmo trutta,NA,Actinopterygii,Salmoniformes,Salmonidae,Salmoninae,Salmo,trutta,Salmo_trutta,1,0,1,1,1
+Salmo_salar,DIA,Actinopterygii,Salmoniformes,Salmonidae,Salmoninae,Salmo,salar,Salmo_salar,0,1,1,1,1
+"Myoxocephalus scorpius, Taurulus bubalis, Cottunculus thomsonii, Leptagonus decagonus, Agonus cataphractus",NA,Actinopterygii,Scorpaeniformes,-,-,-,-,Scorpaenoidei_1,0,1,0,0,1
+"Cottus gobio, Cottus perifretum, Myoxocephalus scorpius, Cottunculus thomsonii",NA,Actinopterygii,Scorpaeniformes,-,-,-,-,Scorpaenoidei_2,1,0,1,0,0
+Cyclopterus_lumpus,MA,Actinopterygii,Scorpaeniformes,Cyclopteridae,Cyclopterinae,Cyclopterus,lumpus,Cyclopterus_lumpus,0,1,0,0,1
+Liparis_liparis,ER,Actinopterygii,Scorpaeniformes,Liparidae,-,Liparis,liparis,Liparis_liparis,0,1,0,0,0
+"Eutrigla gurnardus, Chelidonichthys cuculus, Chelidonichthys lucerna, Chelidonichthys lastoviza (a), Chelidonichthys obscurus (a)",NA,Actinopterygii,Scorpaeniformes,Triglidae,Triglinae,-,-,Triglinae,0,1,0,1,0
+Hippocampus_hippocampus,ER,Actinopterygii,Syngnathiformes,Syngnathidae,Hippocampinae,Hippocampus,hippocampus,Hippocampus_hippocampus,0,1,0,0,0
+Nerophis_lumbriciformis,ER,Actinopterygii,Syngnathiformes,Syngnathidae,Nerophinae,Nerophis,lumbriciformis,Nerophis_lumbriciformis,0,1,1,0,0
+Syngnathus_acus,ER,Actinopterygii,Syngnathiformes,Syngnathidae,Syngnathinae,Syngnathus,acus,Syngnathus_acus,0,0,0,1,0
+,-,Amphibia,Anura,Bufonidae,-,Bufo,spinosus,Bufo_spinosus,1,0,1,1,0
+,-,Amphibia,Caudata,Salamandridae,Pleurodelinae,Lissotriton,helveticus,Lissotriton_helveticus,1,0,0,0,1
+,-,Amphibia,Caudata,Salamandridae,Salamandrinae,Salamandra,salamandra,Salamandra_salamandra,1,0,0,0,0
+"Accipiter nisus, Ardenna bulleri, Podiceps grisegena (a), Puffinus puffinus (a), Puffinus mauretanicus (a)",-,Aves,-,-,-,-,-,Aves,1,0,0,1,0
+,-,Aves,Accipitriformes,Accipitridae,-,Buteo,buteo,Buteo_buteo,1,0,0,0,0
+"Anser anser, Anser albifrons, Cygnus olor, Cygnus columbianus, Cygnus cygnus, Branta bernicla, Branta canadensis, Branta leucopsis (a), Branta hutchinsii (a)",-,Aves,Anseriformes,Anatidae,-,-,-,Anatidae_1,1,1,1,1,1
+"Anas platyrhynchos, Anas acuta, Anas crecca, Anas rubripes (a), Tadorna tadorna, Mareca strepera, Mareca penelope, Somateria mollissima, Bucephala clangula, Mergus merganser, Mergus serrator",-,Aves,Anseriformes,Anatidae,-,-,-,Anatidae_2,1,1,1,1,1
+"Anas platyrhynchos, Anas acuta, Anas crecca, Anas rubripes (a), Tadorna tadorna, Mareca strepera, Mareca penelope, Somateria mollissima, Bucephala clangula, Mergus merganser, Mergus serrator, Melanitta americana, Melanitta fusca (a), Melanitta nigra (a), Mergus merganser",-,Aves,Anseriformes,Anatidae,-,-,-,Anatidae_3,0,0,0,0,1
+,-,Aves,Anseriformes,Anatidae,Anatinae,Aix,galericulata,Aix_galericulata,1,0,0,0,0
+"Tadorna ferruginea, Tadorna tadorna",-,Aves,Anseriformes,Anatidae,Tadorninae,Tadorna,-,Tadorna_sp.,0,0,1,1,0
+"Pluvialis squatarola, Pluvialis apricaria, Pluvialis dominica, Pluvialis fulva, Stercorarius parasiticus",-,Aves,Charadriiformes,-,-,-,-,Charadriiformes,0,0,0,1,0
+,-,Aves,Charadriiformes,Haematopodidae,-,Haematopus,ostralegus,Haematopus_ostralegus_1,0,1,0,1,0
+,-,Aves,Charadriiformes,Haematopodidae,-,Haematopus,ostralegus,Haematopus_ostralegus_2,0,0,0,0,1
+"Larus argentatus, Larus marinus, Larus glaucoides, Larus canus, Larus cachinnans (a), Larus michahellis (a), Larus hyperboreus (a), Larus fuscus (a), Chroicocephalus ridibundus, Rissa tridactyla, Xema sabini, Rhodostethia rosea, Pagophila eburnea",-,Aves,Charadriiformes,Laridae,-,-,-,Laridae_1,1,0,1,1,1
+"Larus argentatus, Larus marinus, Larus glaucoides, Larus canus, Larus cachinnans (a), Larus michahellis (a), Larus hyperboreus (a), Larus fuscus (a), Chroicocephalus ridibundus, Rissa tridactyla, Xema sabini, Rhodostethia rosea, Pagophila eburnea",-,Aves,Charadriiformes,Laridae,-,-,-,Laridae_2,1,1,0,0,1
+"Calidris alpina, Gallinago gallinago, Limnodromus scolopaceus",-,Aves,Charadriiformes,Scolopacidae,-,-,-,Scolopacidae_1,0,0,1,1,1
+"Calidris alpina, Gallinago gallinago",-,Aves,Charadriiformes,Scolopacidae,-,-,-,Scolopacidae_2,0,0,1,1,1
+,-,Aves,Charadriiformes,Scolopacidae,,Numenius,arquata,Numenius_arquata,0,0,1,1,1
+"Columba oenas, Columba palumbus, Streptopelia decaocto",-,Aves,Columbiformes,Columbidae,-,-,-,Columbidae,1,0,1,1,1
+,-,Aves,Galliformes,Phasianidae,Perdicinae,Alectoris,rufa,Alectoris_rufa,0,0,1,0,0
+,-,Aves,Gruiformes,Rallidae,-,Fulica,atra,Fulica_atra,1,0,1,1,1
+,-,Aves,Gruiformes,Rallidae,-,Gallinula,chloropus,Gallinula_chloropus,1,0,1,1,1
+"Fringilla coelebs, Fringilla montifringilla, Motacilla cinerea, Motacilla tschutschensis, Motacilla alba, Piranga olivacea, Anthus hodgsoni, Anthus cervinus, Anthus godlewskii (a), Anthus gustavi (a), Anthus spinoletta (a), Anthus petrosus (a), Anthus rubescens (a), Pyrrhula pyrrhula, Carpodacus erythrinus, Pheucticus ludovicianus",-,Aves,Passeriformes,-,-,-,-,Passeriformes_1,1,0,0,0,0
+"Carduelis carduelis, Carduelis citrinella (a), Emberiza calandra (a), Emberiza cirlus (a), Plectrophenax nivalis",-,Aves,Passeriformes,-,-,-,-,Passeriformes_2,1,0,0,0,0
+"Turdus viscivorus, Turdus philomelos, Turdus iliacus, Turdus merula, Turdus pilaris (a), Parus major",-,Aves,Passeriformes,-,-,-,-,Passeriformes_3,1,0,1,1,0
+"Turdus philomelos, Turdus iliacus, Turdus merula, Turdus obscurus, Turdus atrogularis, Turdus ruficollis, Turdus pilaris (a), Turdus torquatus (a), Parus major, Cyanistes cyanus, Periparus ater",-,Aves,Passeriformes,-,-,-,-,Passeriformes_4,1,0,0,1,1
+"Corvus frugilegus, Corvus corone, Corvus corax, Corvus monedula (a), Pica pica",-,Aves,Passeriformes,Corvidae,-,-,-,Corvidae,1,0,1,1,1
+,-,Aves,Passeriformes,Corvidae,Corvinae,Garrulus,glandarius,Garrulus_glandarius,1,0,1,0,0
+"Parus major, Cyanistes caeruleus, Periparus ater",-,Aves,Passeriformes,Paridae,-,-,-,Paridae,1,0,0,0,0
+,-,Aves,Passeriformes,Regulidae,-,Regulus,regulus,Regulus_regulus,1,0,0,0,0
+,-,Aves,Passeriformes,Sturnidae,-,Sturnus,vulgaris,Sturnus_vulgaris,1,1,0,1,1
+,-,Aves,Passeriformes,Sylviidae,-,Sylvia,atricapilla,Sylvia_atricapilla,1,0,0,0,0
+,-,Aves,Pelecaniformes,Ardeidae,Ardeinae,Bubulcus,ibis,Bubulcus_ibis,0,0,0,0,1
+"Ardea alba, Ardea cinerea, Bubulcus ibis",-,Aves,Pelecaniformes,Ardeidae,,-,-,Ardeidae,1,0,1,0,0
+,-,Aves,Piciformes,Picidae,Picinae,Dendrocopos,major,Dendrocopos_major,1,0,0,0,0
+,-,Aves,Podicipediformes,Podicipedidae,-,Podiceps,cristatus,Podiceps_cristatus,1,0,1,1,0
+,-,Aves,Podicipediformes,Podicipedidae,-,Podiceps,nigricollis,Podiceps_nigricollis,0,0,0,0,1
+,-,Aves,Suliformes,Phalacrocidae,-,Phalacrocorax,carbo,Phalacrocorax_carbo_1,0,1,1,1,1
+,-,Aves,Suliformes,Phalacrocoracidae,-,Phalacrocorax,carbo,Phalacrocorax_carbo_2,1,1,1,1,0
+,-,Mammalia,Artiodactyla,Cervidae,Capreolinae,Capreolus,capreolus,Capreolus_capreolus,1,0,1,1,0
+,-,Mammalia,Carnivora,Canidae,Caninae,Vulpes,vulpes,Vulpes_vulpes,1,0,1,0,0
+,-,Mammalia,Carnivora,Mustelidae,Guloninae,Martes,foina,Martes_foina,1,0,0,0,0
+,-,Mammalia,Carnivora,Mustelidae,Melinae,Meles,meles,Meles_meles,1,0,0,0,0
+"Phoca vitulina, Halichoerus grypus",-,Mammalia,Carnivora,Phocidae,-,-,-,Phocidae,0,1,1,1,1
+"Tursiops truncatus, Delphinus delphis",-,Mammalia,Cetacea,Delphinidae,Delphininae,-,-,Delphininae_1,0,1,1,1,1
+"Tursiops truncatus, Delphinus delphis",-,Mammalia,Cetacea,Delphinidae,Delphininae,-,-,Delphininae_2,0,1,0,0,1
+,-,Mammalia,Cetacea,Phocoenidae,-,Phocoena,phocoena,Phocoena_phocoena,0,1,0,0,1
+"Microtus subterraneus, Microtus agrestis, Microtus arvalis",-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Microtus,-,Microtus_sp.,1,0,0,0,0
+,-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Microtus,arvalis,Microtus_arvalis,1,0,0,0,0
+,-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Microtus,subterraneus,Microtus_subterraneus,1,0,0,0,0
+,-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Myodes,glareolus,Myodes_glareolus,1,0,1,0,0
+,-,Mammalia,Rodentia,Cricetidae,Arvicolinae,Ondatra,zibethicus,Ondatra_zibethicus,1,1,1,1,1
+,-,Mammalia,Rodentia,Muridae,Murinae,Apodemus,sylvaticus,Apodemus_sylvaticus,1,0,1,1,0
+,-,Mammalia,Rodentia,Muridae,Murinae,Rattus,norvegicus,Rattus_norvegicus,1,0,1,1,1
+,-,Mammalia,Rodentia,Myocastoridae,-,Myocastor,coypus,Myocastor_coypus,1,1,1,1,1
+,-,Mammalia,Rodentia,Sciuridae,Sciurinae,Sciurus,vulgaris,Sciurus_vulgaris,1,0,0,0,0
+"Sorex minutus, Sorex coronatus",-,Mammalia,Soricomorphes,Soricidae,Soricinae,Sorex,-,Sorex_sp.,1,0,0,0,0
+,-,Mammalia,Soricomorphes,Talpidae,Talpinae,Talpa,europaea,Talpa_europaea,0,0,0,1,0
