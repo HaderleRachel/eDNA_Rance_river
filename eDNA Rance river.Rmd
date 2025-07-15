@@ -1840,4 +1840,3 @@ plotf<-ggplot(data, aes(x = Method, y = Value, fill = Method)) +
 plotf
 ggsave("Fig6.tiff", plotf,width = 13, height = 4, units = "in", dpi = 300, compression = "lzw")
 ```
-
