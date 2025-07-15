@@ -25,6 +25,7 @@ library(viridis)
 library(cowplot)
 library(fmsb)
 library(gridExtra)
+library(ggspatial)
 
 # Spatial data
 library(sf)
@@ -34,6 +35,8 @@ library(ggspatial)
 library(tidyterra)
 library(geosphere)
 library(raster)
+library(rasterVis)
+library(osmdata)
 
 # Biodiversity analysis
 library(ape)
@@ -56,44 +59,171 @@ library(factoextra)
 # Define coordinates for sampling stations
 stations <- data.frame(
   name = c("Station 1", "Station 2", "Station 3", "Station 4", "Station 5"),
-  lon = c(-2.024, -2.023, -2.007, -1.967, -2.017),
-  lat = c(48.625, 48.606, 48.595, 48.555, 48.484)
+  lon = c(-2.0435, -2.0182, -1.9710, -1.9926, -2.0049),
+  lat = c(48.6405, 48.6027, 48.5373, 48.5833, 48.4759)
 )
 
-# Convert to sf object (WGS84)
+# Convert station coordinates to an sf object with WGS84 CRS
 stations_sf <- st_as_sf(stations, coords = c("lon", "lat"), crs = 4326)
 
-# Load base world map
+# Load a base world map for context (from Natural Earth)
 world <- ne_countries(scale = "large", returnclass = "sf")
 
-# Load Lidar shapefile (adjust path as needed)
+# Load Lidar shapefile (replace path with your actual file path)
 lidar_map <- read_sf("~/Documents/R/ADNeRance/AdneRance/Lidar_Rance_2019_Area-Int10m-RGF93-L93_zone-non-traitee-sursol/Area-Int10m-RGF93-L93_zone-non-traitee-sursol.shp")
-lidar_map <- st_transform(lidar_map, crs = 4326)
+lidar_map <- st_transform(lidar_map, crs = 4326)  # Transform to WGS84 for consistency
 
-# Define geographic bounding box for inset map (Brittany region)
+# Define a bounding box for an inset map (covering Brittany region)
 brittany_bbox <- c(xmin = -3.5, xmax = -1.5, ymin = 47.5, ymax = 49.5)
 
-# Main map with station labels
+# Load rasterized lidar data (already in WGS84)
+lidar_raster_wgs849 <- raster("lidar_rance.tif")
+
+# Convert raster to dataframe for plotting
+df <- as.data.frame(lidar_raster_wgs849, xy = TRUE)
+names(df)[which(!names(df) %in% c("x", "y"))] <- "elevation"
+
+# Define a custom bounding box for the Rance estuary
+bbox <- c(xmin = -2.10, ymin = 48.45, xmax = -1.90, ymax = 48.90)
+
+# Download OpenStreetMap features within the bounding box
+coastline <- opq(bbox) %>%
+  add_osm_feature(key = "natural", value = "coastline") %>%
+  osmdata_sf()
+
+sea <- opq(bbox) %>%
+  add_osm_feature(key = "place", value = "sea") %>%
+  osmdata_sf()
+
+rivers <- opq(bbox)%>%
+  add_osm_feature(key="waterway", value = "river")%>%
+  osmdata_sf()
+
+# Define station transects with start and end coordinates
+stations_coords <- tibble::tribble(
+  ~station, ~lat1, ~lon1, ~lat2, ~lon2,
+  "Station 1", 48.6572222, -2.0594444, 48.6236111, -2.0277777,
+  "Station 2", 48.6152778, -2.0280555, 48.59,      -2.0083333,
+  "Station 3", 48.5513889, -1.97, 48.5219444, -1.97,
+  "Station 4", 48.59041,   -2.00691,   48.56815,   -1.99249,
+  "Station 5", 48.46600,   -2.02690,   48.48386,   -1.99927
+)
+
+# Create rectangle (buffer) polygons around each transect line
+create_rectangle_around_line <- function(lat1, lon1, lat2, lon2, width_m = 1000) {
+  line <- matrix(c(lon1, lat1, lon2, lat2), ncol = 2, byrow = TRUE)
+  azimuth <- geosphere::bearing(line[1,], line[2,])
+  perp_azimuth_1 <- (azimuth + 90) %% 360
+  perp_azimuth_2 <- (azimuth - 90) %% 360
+
+  # Get offset points on each side of the transect
+  left_point1 <- geosphere::destPoint(line[1,], perp_azimuth_1, width_m / 2)
+  right_point1 <- geosphere::destPoint(line[1,], perp_azimuth_2, width_m / 2)
+  left_point2 <- geosphere::destPoint(line[2,], perp_azimuth_1, width_m / 2)
+  right_point2 <- geosphere::destPoint(line[2,], perp_azimuth_2, width_m / 2)
+
+  # Build polygon geometry
+  coords_poly <- rbind(
+    left_point1,
+    left_point2,
+    right_point2,
+    right_point1,
+    left_point1  # Close the polygon
+  )
+
+  st_polygon(list(coords_poly)) %>%
+    st_sfc(crs = 4326)
+}
+
+# Apply the polygon creation function to all transects
+zones_sf <- stations_coords %>%
+  rowwise() %>%
+  mutate(geometry = create_rectangle_around_line(lat1, lon1, lat2, lon2, width_m = 1000)) %>%
+  st_as_sf()
+
+# Convert the lidar raster to `terra` format and reproject to Lambert 93 (EPSG:2154)
+rast <- terra::rast(df, type = "xyz", crs = "EPSG:2154")
+
+# Extract all land pixels (elevation < 0)
+rast_terre <- rast < 0
+
+# Convert land raster to polygons and make it valid
+terre_poly <- terra::as.polygons(rast_terre, dissolve = TRUE) %>%
+  st_as_sf() %>%
+  st_make_valid()
+
+# Create a bounding box around sampling zones
+bbox <- st_as_sfc(st_bbox(zones_sf))
+
+# Define the marine zone as the difference between bbox and lidar-derived land area
+zone_marine <- st_difference(bbox, st_union(lidar_map))
+
+# Intersect marine area with each transect polygon
+zones_marine <- st_intersection(zones_sf, zone_marine)
+zones_marine <- sf::st_make_valid(zones_marine)
+
+# Compute centroids for labels
+zones_centroids <- st_centroid(zones_marine)
+
+# Extract coordinates for labeling
+label_df <- zones_centroids %>%
+  mutate(x_label = st_coordinates(.)[, 1],
+         y_label = st_coordinates(.)[, 2]) %>%
+  st_drop_geometry()
+
+# Fix mislabeled stations (swap Station 3 and 4 names if needed)
+label_df <- label_df %>%
+  mutate(station = case_when(
+    station == "Station 3" ~ "Station 4",
+    station == "Station 4" ~ "Station 3",
+    TRUE ~ station
+  ))
+
+# Crop lidar map above latitude 48.5 (in projected UTM 30N coordinates)
+lidar_proj <- st_transform(lidar_map, 32630)
+limite_lat <- st_transform(st_sfc(st_point(c(0, 48.5)), crs = 4326), 32630)
+y_max_metre <- st_coordinates(limite_lat)[, "Y"]
+
+bbox_proj <- st_bbox(lidar_proj)
+bbox_proj["ymax"] <- y_max_metre  
+lidar_crop_proj <- st_crop(lidar_proj, bbox_proj)
+
+# Reproject back to WGS84
+lidar_crop <- st_transform(lidar_crop_proj, 4326)
+
+# Create the main map using ggplot2
 main_map <- ggplot() +
-  geom_sf(data = lidar_map, fill = "grey90", color = NA) +
-  geom_label_repel(data = stations %>%
-                     mutate(x_label = lon + c(0.002, -0.002, 0.0015, -0.002, 0.001),
-                            y_label = lat + c(0.0015, 0.001, -0.001, -0.002, -0.004)),
-                   aes(x = x_label, y = y_label, label = name),
-                   color = "black", fontface = "bold", size = 3) +
-  geom_segment(aes(x = -2.01, y = 48.496, xend = -1.99, yend = 48.486), color = "blue", size = 0.8) +
-  geom_segment(aes(x = -2.04, y = 48.614, xend = -2.001, yend = 48.624), color = "blue", size = 0.8) +
-  annotate("text", x = -1.99, y = 48.484, label = "Le Châtelier", color = "blue", hjust = -0.2, vjust = 0.5, size = 3.5) +
-  annotate("text", x = -2.000, y = 48.624, label = "Tidal power plant", color = "blue", hjust = -0.2, vjust = 0.5, size = 3.5) +
-  annotation_scale(location = "bl", width_hint = 0.2) +
-  annotation_north_arrow(location = "bl", which_north = "true",
-                         pad_x = unit(0.3, "in"), pad_y = unit(0.2, "in"),
+  geom_sf(data = rivers$osm_lines, color = "grey", size = 0.5) +
+  geom_sf(data = coastline$osm_lines, color = "black", size = 0.5) +
+  geom_sf(data = zones_marine, aes(fill = station), color = "black", alpha = 0.5, show.legend = FALSE) +
+  geom_label_repel(data = label_df,
+                   aes(x = x_label, y = y_label, label = station),
+                   color = "black", fontface = "bold", size = 5) +
+
+  # Add scale bar and north arrow
+  annotation_scale(location = "tr", width_hint = 0.3) +
+  annotation_north_arrow(location = "tr", which_north = "true",
+                         pad_x = unit(0.2, "in"), pad_y = unit(0.35, "in"),
                          style = north_arrow_fancy_orienteering,
                          height = unit(1, "cm"), width = unit(1, "cm")) +
-  coord_sf(xlim = c(-2.1, -1.87), ylim = c(48.475, 48.63), expand = FALSE) +
+
+  # Annotate Tidal power plant and Le Châtelier site
+  geom_segment(aes(x = -2.0294, y = 48.6169, xend = -2.0183, yend = 48.6189), color = "blue", size = 1) +
+  annotate("text", x = -2.017, y = 48.6192, label = "Tidal power plant", color = "blue", hjust = 0, vjust = 0.5, size = 5) +
+
+  geom_segment(aes(x = -2.0021, y = 48.4918, xend = -2.0002, yend = 48.4913), color = "blue", size = 1) +
+  annotate("text", x = -1.999, y = 48.4911, label = "Le Châtelier", color = "blue", hjust = 0, vjust = 1, size = 5) +
+
+  # Set map extent and labels
+  coord_sf(xlim = c(-2.07, -1.90), ylim = c(48.47, 48.68), expand = FALSE) +
   xlab("Longitude") + ylab("Latitude") +
+
+  # Final theme adjustments
   theme_minimal() +
-  theme(panel.grid = element_blank())
+  theme(panel.grid = element_blank(), text = element_text(size = 14))
+
+# Print the map
+main_map
 ```
 
 ###Overview map of Brittany with study area highlighted
@@ -112,14 +242,14 @@ overview_map <- ggplot() +
 ```{r}
 combined_map <- ggdraw() +
   draw_plot(main_map, 0, 0, 1, 1) +
-  draw_plot(overview_map, 0.05, 0.05, 0.25, 0.25)
+  draw_plot(overview_map, 0.05, 0.07, 0.25, 0.25)
 
 # Display the final map
 print(combined_map)
 
 # Save the map to a file
 ggsave("Fig1.png", combined_map,
-       width = 7, height = 7, dpi = 1200)
+       width = 11.25, height = 8.75, dpi = 300)
 ```
 
 ###Alpha diversity
@@ -137,28 +267,39 @@ PAtaxa$Station <- factor(as.character(PAtaxa$Station),
 PAtaxa$Class <- gsub("\\s+", " ", PAtaxa$Class) |> trimws()
 PAtaxa$Class <- as.factor(PAtaxa$Class)
 
-# Create the plot
+# Create a barplot showing the number of MOTUs detected per taxonomic class and station
 p <- ggplot(PAtaxa, aes(x = Class, fill = Class)) +
+  # Draw bars with black border
   geom_bar(width = 0.7, color = "black") +
+  # Add count labels above each bar
   geom_text(stat = 'count', aes(label = ..count..), 
-            vjust = -0.3, size = 2.5) +
+            vjust = -0.3, size = 4.5) +
+  # Facet the plot by sampling station in a single row
   facet_wrap(~Station, nrow = 1) +
+  # Use viridis color palette for better accessibility and aesthetics
   scale_fill_viridis_d(option = "D", end = 0.85, name = "Taxonomic Class") +
+  # Axis labels
   labs(
     x = NULL,
     y = "Number of MOTUs Detected"
   ) +
-  theme_bw(base_size = 11) +
+  # Apply a clean black and white theme with larger base font size
+  theme_bw(base_size = 14) +
+  # Customize theme for improved readability in scientific publication
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    strip.background = element_rect(fill = "grey85", color = "black"),
-    strip.text = element_text(face = "bold"),
-    legend.position = "bottom",
-    panel.grid.major.x = element_blank()
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 12),     # Rotate x-axis labels
+    axis.text.y = element_text(size = 12),                            # Increase y-axis label size
+    axis.title.y = element_text(size = 14, face = "bold"),            # Bold y-axis title
+    strip.background = element_rect(fill = "grey85", color = "black"),# Facet background
+    strip.text = element_text(face = "bold", size = 13),              # Facet title style
+    legend.title = element_text(size = 13, face = "bold"),            # Legend title
+    legend.text = element_text(size = 12),                            # Legend labels
+    legend.position = "bottom",                                       # Place legend below plot
+    panel.grid.major.x = element_blank()                              # Remove vertical grid lines
   )
-
+p
 # Export the plot with 1200 dpi for scientific publication
-ggsave("Fig2.png", plot = p, dpi = 1200, width = 10, height = 5)
+ggsave("Fig2.png", plot = p, dpi = 300, width = 10.7, height = 5.8)
 
 ```
 
@@ -202,25 +343,46 @@ numbFish <- data.frame(
            "Station 1", "Station 2", "Station 3", "Station 4", "Station 5")
 )
 
-# Create the plot
+# Create a line and point plot showing the number of MOTUs per category across stations
 FISH <- ggplot(numbFish, aes(x = Stat, y = freq, group = Category, colour = Category)) +
+  
+  # Add data points for each station and category
   geom_point(size = 3) + 
+  
+  # Add connecting lines between points for each category
   geom_line(size = 1.2) +
-  scale_colour_manual(values = c("orange", "brown", "green", "darkblue", "lightblue", "blue")) +
+  
+  # Manually define colors for each Actinopterygii category
+  scale_colour_manual(
+    values = c("orange", "brown", "green", "darkblue", "lightblue", "blue")
+  ) +
+  
+  # Set axis and legend labels
   labs(
-    y = "Number of MOTUs identified",
+    y = "Number of MOTUs detected",
     x = NULL,
     colour = "Actinopterygii Categories"
   ) +
+  
+  # Use a clean black-and-white theme with increased base font size
   theme_bw(base_size = 14) +
+  
+  # Improve text and grid aesthetics for publication
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    strip.background = element_rect(fill = "grey85", color = "black"),
-    strip.text = element_text(face = "bold"),
-    legend.position = "bottom",
-    panel.grid.major.x = element_blank()
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 12),      # Rotate and resize x-axis text
+    axis.text.y = element_text(size = 12),                             # Resize y-axis text
+    axis.title.y = element_text(size = 14, face = "bold"),             # Style y-axis title
+    strip.background = element_rect(fill = "grey85", color = "black"), # Facet strip background
+    strip.text = element_text(face = "bold", size = 13),               # Facet text style
+    legend.title = element_text(size = 13, face = "bold"),             # Legend title style
+    legend.text = element_text(size = 12),                             # Legend text style
+    legend.position = "bottom",                                        # Move legend below plot
+    panel.grid.major.x = element_blank()                               # Remove vertical gridlines
   ) +
+  
+  # Set fixed y-axis range for consistency across stations
   ylim(0, 16)
+
 
 # Display the plot
 print(FISH)
@@ -1499,39 +1661,63 @@ station_labels_birds <- factor(gsub("STATION_", "Station ", rownames(combined_ma
 station_labels_mammals <- factor(gsub("STATION_", "Station ", rownames(combined_matrix_mammals)))
 
 # Function for publication-ready PCA biplots
-plot_pca <- function(res_pca, station_labels, panel_title) {
-  fviz_pca_biplot(
-    res_pca,
-    habillage = station_labels,
-    addEllipses = TRUE,       # to visualize groups
-    label = "var",            # show only variable vectors
-    labelsize = 4,
-    repel = TRUE,
-    col.var = "black",
-    col.ind = "black",
-    legend.title = "Station"
-  ) +
-    ggtitle(panel_title) +
-    theme_classic(base_size = 12) +
+plot_pca_custom_noleg <- function(res_pca, station_labels, panel_title, arrow_scale = NULL) {
+  eig <- res_pca$sdev^2
+  var_explained <- round(100 * eig / sum(eig), 1)
+  
+  df_ind <- as.data.frame(res_pca$x[, 1:2])
+  df_ind$Station <- as.character(station_labels)
+  
+  df_var <- as.data.frame(res_pca$rotation[, 1:2])
+  df_var$Variable <- rownames(df_var)
+  
+  if (is.null(arrow_scale)) {
+    max_ind <- max(abs(df_ind[,1:2]))
+    max_var <- max(abs(df_var[,1:2]))
+    arrow_scale <- max_ind / max_var * 0.7
+  }
+  
+  df_var_scaled <- df_var
+  df_var_scaled$PC1 <- df_var_scaled$PC1 * arrow_scale
+  df_var_scaled$PC2 <- df_var_scaled$PC2 * arrow_scale
+  
+  x_lim <- range(c(df_ind$PC1, df_var_scaled$PC1)) * 1.1
+  y_lim <- range(c(df_ind$PC2, df_var_scaled$PC2)) * 1.1
+  
+  ggplot(df_ind, aes(x = PC1, y = PC2, color = Station)) +
+    geom_hline(yintercept = 0, linetype = "dotted", color = "gray40") +
+    geom_vline(xintercept = 0, linetype = "dotted", color = "gray40") +
+    geom_point(size = 3) +
+    geom_text_repel(aes(label = Station), size = 5, fontface = "plain", show.legend = FALSE) +
+    geom_segment(data = df_var_scaled, aes(x = 0, y = 0, xend = PC1, yend = PC2),
+                 arrow = arrow(length = unit(0.25, "cm")), color = "black") +
+    geom_text_repel(data = df_var_scaled, aes(x = PC1, y = PC2, label = Variable),
+                    color = "black", size = 5, fontface = "italic") +
+    labs(
+      title = panel_title,
+      x = paste0("PC1 (", var_explained[1], "%)"),
+      y = paste0("PC2 (", var_explained[2], "%)")
+    ) +
+    coord_fixed() +
+    xlim(x_lim) +
+    ylim(y_lim) +
+    theme_classic(base_size = 15) +
     theme(
-      plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
-      legend.position = "bottom",
-      legend.title = element_text(face = "bold")
+      plot.title = element_text(hjust = 0.5, face = "bold"),
+      legend.position = "none"
     )
 }
 
-# Create the three PCA plots
-pca_fish_plot <- plot_pca(res.pca_fish, station_labels_fish, "Fish")
-pca_birds_plot <- plot_pca(res.pca_birds, station_labels_birds, "Birds")
-pca_mammals_plot <- plot_pca(res.pca_mammals, station_labels_mammals, "Mammals")
+pca_fish_plot <- plot_pca_custom_noleg(res.pca_fish, station_labels_fish, "Fish")
+pca_birds_plot <- plot_pca_custom_noleg(res.pca_birds, station_labels_birds, "Birds")
+pca_mammals_plot <- plot_pca_custom_noleg(res.pca_mammals, station_labels_mammals, "Mammals")
 
-# Combine the plots
-combined_plot <- grid.arrange(
-  pca_fish_plot,
-  arrangeGrob(pca_birds_plot, pca_mammals_plot, ncol = 2),
-  nrow = 2,
-  heights = c(1.5, 1)
-)
+
+
+library(patchwork)
+combined_plot <- (pca_fish_plot) / (pca_birds_plot | pca_mammals_plot)
+combined_plot <- combined_plot + plot_layout(heights = c(1, 1))
+combined_plot
 
 # Save in high resolution for publication
 ggsave(
@@ -1540,9 +1726,10 @@ ggsave(
   width = 12,
   height = 10,
   units = "in",
-  dpi = 1200,
+  dpi = 300,
   compression = "lzw"
 )
+
 ```
 
 
@@ -1591,7 +1778,7 @@ for (i in 3:nrow(station_data)) {  # Starting from the third row, which correspo
 }
 
 # Save the radar charts to a high-quality image file (1200 dpi)
-png("Fig4.png", width = 12, height = 8, units = "in", res = 1200)
+png("Fig4.png", width = 8, height = 8, units = "in", res = 1200)
 par(mfrow = c(2, 3))
 par(mar = c(2, 2, 2, 2))
 
@@ -1632,9 +1819,10 @@ data <- data.frame(
 # Factors with desired order
 data$Method <- factor(data$Method, levels = c("WFD", "AnaCoNoR", "eDNA"))
 data$Category <- factor(data$Category, levels = c("SR", "FRic", "SES.FRic", "PD", "SES.PD"))
+levels(data$Category) <- gsub("\\.", "_", levels(data$Category))
 
 # Final plot
-ggplot(data, aes(x = Method, y = Value, fill = Method)) +
+plotf<-ggplot(data, aes(x = Method, y = Value, fill = Method)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.7) +
   facet_wrap(~Category, scales = "free_y", nrow = 1) +  # One row of facets
   scale_fill_viridis_d(option = "D", end = 0.85, direction = -1) +  # Discrete viridis palette
@@ -1649,7 +1837,7 @@ ggplot(data, aes(x = Method, y = Value, fill = Method)) +
     panel.grid.major = element_line(size = 0.2),
     panel.grid.minor = element_blank()
   )
-
-ggsave("Fig6.tiff", width = 13, height = 4, units = "in", dpi = 1200, compression = "lzw")
+plotf
+ggsave("Fig6.tiff", plotf,width = 13, height = 4, units = "in", dpi = 300, compression = "lzw")
 ```
 
